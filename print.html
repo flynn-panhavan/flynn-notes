@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flynn Notes – Print</title>
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="vendor/fontawesome/css/fontawesome.min.css">
+  <link rel="stylesheet" href="vendor/fontawesome/css/solid.min.css">
+  <link rel="stylesheet" href="vendor/fontawesome/css/regular.min.css">
+  <link rel="stylesheet" href="base.css">
+  <link rel="stylesheet" href="print.css">
+  <style id="pageRule">@page { size: A4; margin: 18mm 16mm; }</style>
+</head>
+<body>
+<header id="bar">
+  <span class="logo"><i class="fa-solid fa-file-pdf"></i></span>
+  <div class="grow"><b>Print / save as PDF</b><small>A4 paper. In the print window, choose <em>Save as PDF</em> as the destination.</small></div>
+  <label>Margins
+    <select id="margin"><option value="12mm 12mm">Narrow</option><option value="18mm 16mm" selected>Normal</option><option value="25mm 22mm">Wide</option></select>
+  </label>
+  <label class="chk"><input type="checkbox" id="showTitle" checked> Title</label>
+  <button id="go" class="primary"><i class="fa-solid fa-print"></i>Print / Save as PDF</button>
+</header>
+<main id="stage"><article id="sheet">
+  <h1 id="docTitle"></h1>
+  <p id="docMeta"></p>
+  <div id="doc"></div>
+</article></main>
+<script src="shared.js"></script>
+<script src="print.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+/* Flynn Notes – print page */
+html, body { height: auto; background: #e9ebf2; color: #1c2233; }
+* { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 12px 22px; background: #fff; border-bottom: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+#bar .grow { flex: 1; min-width: 0; line-height: 1.3; } #bar small { display: block; color: var(--muted); font-size: 12.5px; }
+#bar label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; }
+#bar select { height: 34px; border: 1px solid var(--line-2); border-radius: 9px; padding: 0 10px; background: #fff; }
+#bar .chk input { accent-color: var(--accent); }
+#stage { display: grid; justify-items: center; padding: 28px 16px 60px; }
+#sheet { width: 210mm; min-height: 297mm; padding: 18mm 16mm; background: #fff; box-shadow: 0 10px 40px rgba(20, 28, 60, .18); border-radius: 3px;
+  font-family: var(--f-family); font-size: var(--f-size); line-height: var(--f-lh); font-style: var(--f-style); font-weight: var(--f-weight); color: #1c2233; animation: slide-up .4s cubic-bezier(.2, .8, .2, 1); }
+#docTitle { margin: 0 0 .15em; font-size: 1.9em; line-height: 1.25; letter-spacing: -.02em; }
+#docMeta { margin: 0 0 1.4em; padding-bottom: .8em; border-bottom: 1px solid #dfe3ef; color: #667089; font-size: .8em; }
+
+#doc { word-wrap: break-word; }
+#doc p, #doc div { margin: 0 0 .55em; }
+#doc h1 { font-size: 1.6em; line-height: 1.3; margin: .85em 0 .3em; font-weight: 700; break-after: avoid; }
+#doc h2 { font-size: 1.28em; line-height: 1.35; margin: .8em 0 .3em; font-weight: 700; break-after: avoid; }
+#doc ul, #doc ol { margin: 0 0 .6em; padding-left: 1.5em; }
+#doc li { break-inside: avoid; }
+#doc li::marker { color: var(--c-bullet, var(--accent)); }
+#doc a { color: var(--c-link, var(--accent)); text-underline-offset: 3px; }
+#doc hr { border: 0; border-top: 1px solid #dfe3ef; margin: 1.2em 0; }
+#doc blockquote { margin: .7em 0; padding: .2em 0 .2em 1em; border-left: 3px solid var(--c-quote, var(--accent)); color: #667089; break-inside: avoid; }
+#doc pre { background: var(--c-code-bg, #f6f7fb); color: var(--c-code-ink, inherit); border: 1px solid #e5e8f0; border-radius: 10px; padding: 10px 12px; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; margin: .7em 0; }
+#doc code { background: var(--c-code-bg, #eceef5); color: var(--c-code-ink, inherit); padding: .1em .4em; border-radius: 5px; font: .9em var(--mono); }
+#doc pre code { background: none; padding: 0; }
+#doc ul.check { list-style: none; padding-left: 2px; }
+#doc ul.check li { position: relative; padding-left: 29px; }
+#doc ul.check li::before { content: ""; position: absolute; left: 3px; top: calc(.5em * var(--f-lh) - 8px + .1em); width: 16px; height: 16px; border: 1.8px solid #667089; border-radius: 5px; }
+#doc ul.check li.done { color: #667089; text-decoration: line-through; }
+#doc ul.check li.done::before { border-color: var(--c-check, var(--accent)); background: var(--c-check, var(--accent)) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-6.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat; }
+
+@media print {
+  html, body { background: #fff; }
+  #bar { display: none; }
+  #stage { display: block; padding: 0; }
+  #sheet { width: auto; min-height: 0; padding: 0; box-shadow: none; border-radius: 0; animation: none; }
+}
