@@ -117,7 +117,3 @@ The extension requests these Chrome permissions:
 
 - Improved font and font-size controls to reflect the current selection, including mixed formatting and an empty caret.
 - Redesigned the full-screen Settings page with a live preview.
-
-## License
-
-No license file is currently included. Unless a license is added to this repository, all rights remain with the copyright holder.
