@@ -1,135 +1,330 @@
 <!doctype html>
 <html lang="en" data-theme="light">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Flynn Notes</title>
-  <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="vendor/fontawesome/css/fontawesome.min.css">
-  <link rel="stylesheet" href="vendor/fontawesome/css/solid.min.css">
-  <link rel="stylesheet" href="vendor/fontawesome/css/regular.min.css">
-  <link rel="stylesheet" href="base.css">
-  <link rel="stylesheet" href="app.css">
-</head>
-<body>
-<div id="app">
-  <div id="scrim" hidden></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4c5cff" />
+    <title>Flynn Notes</title>
+    <link rel="stylesheet" href="fonts.css" />
+    <link rel="stylesheet" href="vendor/fontawesome/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="vendor/fontawesome/css/solid.min.css" />
+    <link rel="stylesheet" href="vendor/fontawesome/css/regular.min.css" />
+    <link rel="stylesheet" href="base.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="premium.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="scrim" hidden></div>
 
-  <aside id="drawer" aria-label="Notes">
-    <div class="d-top">
-      <div class="brand"><span class="logo"><i class="fa-solid fa-feather-pointed"></i></span><span>Flynn Notes</span></div>
-      <button id="newBtn" class="primary"><i class="fa-solid fa-plus"></i><span>New note</span></button>
+      <aside id="drawer" aria-label="Notes">
+        <div class="d-top">
+          <div class="brand">
+            <span class="logo"><i class="fa-solid fa-feather-pointed"></i></span
+            ><span>Flynn Notes</span>
+          </div>
+          <button id="newBtn" class="primary">
+            <i class="fa-solid fa-plus"></i><span>New note</span>
+          </button>
+        </div>
+        <label class="search"
+          ><i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            id="search"
+            type="search"
+            placeholder="Search titles and content"
+            autocomplete="off"
+        /></label>
+        <nav id="cats" aria-label="Views"></nav>
+        <div id="nbBar" hidden>
+          <i class="fa-solid fa-book-open"></i><b id="nbName"></b>
+          <button id="nbRename" class="ib" title="Rename notebook">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+          <button id="nbDelete" class="ib" title="Delete notebook">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+        <div class="nb-head">
+          <span>Notebooks</span>
+          <div style="display: flex; align-items: center; gap: 2px">
+            <button id="nbAdd" class="ib" title="New notebook">
+              <i class="fa-solid fa-folder-plus"></i>
+            </button>
+            <button
+              id="nbCollapse"
+              class="ib chev"
+              title="Collapse/Expand notebooks"
+            >
+              <i class="fa-solid fa-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+        <nav id="nbs" aria-label="Notebooks"></nav>
+        <ul id="list"></ul>
+        <div class="d-foot">
+          <button id="settingsBtn" class="ghost">
+            <i class="fa-solid fa-gear"></i><span>Settings</span>
+          </button>
+          <button
+            id="importBtn"
+            class="ib"
+            title="Import .md or .txt files as notes"
+          >
+            <i class="fa-solid fa-file-import"></i>
+          </button>
+          <button id="tabBtn" class="ib" title="Open as a full page">
+            <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main id="pane">
+        <header id="top">
+          <button id="menuBtn" class="ib" title="All notes">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <input
+            id="title"
+            placeholder="Untitled note"
+            spellcheck="true"
+            aria-label="Note title"
+          />
+          <button id="toolsBtn" class="ib" title="Hide toolbar">
+            <i class="fa-solid fa-text-height"></i>
+          </button>
+          <button id="pinBtn" class="ib" title="Pin">
+            <i class="fa-solid fa-thumbtack"></i>
+          </button>
+          <button id="favBtn" class="ib" title="Favorite">
+            <i class="fa-regular fa-star"></i>
+          </button>
+          <button id="moreBtn" class="ib" title="More">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+        </header>
+
+        <div id="trashBar" hidden>
+          <i class="fa-solid fa-trash-can"></i
+          ><span>This note is in the Trash.</span>
+          <button id="restoreBtn" class="ghost">Restore</button>
+          <button id="purgeBtn" class="ghost danger">Delete forever</button>
+        </div>
+
+        <div id="actbar">
+          <button id="undoBtn" class="act" type="button">
+            <i class="fa-solid fa-rotate-left"></i><span>Back</span>
+          </button>
+          <button id="redoBtn" class="act" type="button">
+            <i class="fa-solid fa-rotate-right"></i><span>Next</span>
+          </button>
+          <span class="grow"></span>
+          <button id="saveBtn" class="act save" type="button">
+            <i class="fa-solid fa-floppy-disk"></i><span>Saved</span>
+          </button>
+        </div>
+
+        <div id="tools" role="toolbar" aria-label="Formatting">
+          <div class="grp">
+            <select id="fontSel" title="Font"></select>
+            <select id="sizeSel" title="Font size"></select>
+            <button
+              class="step dec"
+              data-cmd="sizeDown"
+              aria-label="Smaller text"
+            >
+              <span class="stp"
+                ><span class="a">A</span><span class="pm">−</span></span
+              >
+            </button>
+            <button class="step inc" data-cmd="sizeUp" aria-label="Larger text">
+              <span class="stp"
+                ><span class="a">A</span><span class="pm">+</span></span
+              >
+            </button>
+          </div>
+          <div class="grp">
+            <button data-cmd="bold"><i class="fa-solid fa-bold"></i></button>
+            <button data-cmd="italic">
+              <i class="fa-solid fa-italic"></i>
+            </button>
+            <button data-cmd="underline">
+              <i class="fa-solid fa-underline"></i>
+            </button>
+            <button data-cmd="strike">
+              <i class="fa-solid fa-strikethrough"></i>
+            </button>
+            <button data-cmd="textColor">
+              <i class="fa-solid fa-font"></i>
+            </button>
+            <button data-cmd="highlight">
+              <i class="fa-solid fa-highlighter"></i>
+            </button>
+          </div>
+          <div class="grp">
+            <button data-cmd="h1" class="t">H1</button>
+            <button data-cmd="h2" class="t">H2</button>
+            <button data-cmd="p"><i class="fa-solid fa-paragraph"></i></button>
+          </div>
+          <div class="grp">
+            <button data-cmd="ul"><i class="fa-solid fa-list-ul"></i></button>
+            <button data-cmd="ol"><i class="fa-solid fa-list-ol"></i></button>
+            <button data-cmd="check">
+              <i class="fa-regular fa-square-check"></i>
+            </button>
+            <button data-cmd="quote">
+              <i class="fa-solid fa-quote-left"></i>
+            </button>
+          </div>
+          <div class="grp">
+            <button data-cmd="link"><i class="fa-solid fa-link"></i></button>
+            <button data-cmd="hr"><i class="fa-solid fa-minus"></i></button>
+            <button data-cmd="code"><i class="fa-solid fa-code"></i></button>
+          </div>
+          <div class="grp">
+            <button data-cmd="clear"><i class="fa-solid fa-eraser"></i></button>
+            <button data-cmd="spell">
+              <i class="fa-solid fa-spell-check"></i>
+            </button>
+          </div>
+          <div class="grp end">
+            <button data-cmd="pinTools">
+              <i class="fa-solid fa-thumbtack"></i>
+            </button>
+            <button data-cmd="toggleTools">
+              <i class="fa-solid fa-eye-slash"></i>
+            </button>
+          </div>
+        </div>
+
+        <form id="linkbar" hidden>
+          <i class="fa-solid fa-link"></i>
+          <input
+            id="linkUrl"
+            placeholder="Paste a link and press Enter"
+            autocomplete="off"
+          />
+          <button type="submit" class="ghost">Apply</button>
+          <button type="button" id="linkCancel" class="ghost">Cancel</button>
+        </form>
+
+        <div
+          id="editor"
+          contenteditable="true"
+          spellcheck="true"
+          data-placeholder="Start writing…"
+          role="textbox"
+          aria-multiline="true"
+          aria-label="Note"
+        ></div>
+
+        <div id="listbar" hidden>
+          <span class="lb-t"><i class="fa-solid fa-list-ol"></i>Numbering</span>
+          <label
+            >Start at
+            <input id="lbStart" type="number" min="1" max="9999" step="1"
+          /></label>
+          <button
+            type="button"
+            id="lbRestart"
+            title="Start this list again at 1"
+          >
+            Restart at 1
+          </button>
+          <button
+            type="button"
+            id="lbCont"
+            title="Carry on counting from the list above"
+          >
+            Continue
+          </button>
+        </div>
+
+        <footer>
+          <span id="counts">
+            <span class="chip-s" title="Words"
+              ><i class="fa-solid fa-align-left"></i><b id="wc">0</b
+              ><em>words</em></span
+            >
+            <span class="chip-s" title="Characters"
+              ><i class="fa-solid fa-font"></i><b id="cc">0</b
+              ><em>chars</em></span
+            >
+            <span class="chip-s rt" title="Estimated reading time"
+              ><i class="fa-regular fa-hourglass-half"></i><b id="rt">0</b
+              ><em>min read</em></span
+            >
+          </span>
+          <span id="meta"></span>
+          <span id="status"
+            ><i class="fa-solid fa-circle-check"></i
+            ><span>Auto-saved</span></span
+          >
+        </footer>
+      </main>
+
+      <div id="menu" class="pop" hidden>
+        <button data-m="move">
+          <i class="fa-solid fa-book"></i><span>Move to notebook…</span>
+        </button>
+        <button data-m="archive">
+          <i class="fa-solid fa-box-archive"></i><span>Archive</span>
+        </button>
+        <button data-m="trash">
+          <i class="fa-solid fa-trash-can"></i><span>Move to Trash</span>
+        </button>
+        <button data-m="pdf">
+          <i class="fa-solid fa-file-pdf"></i
+          ><span>Print / save as PDF (A4)</span>
+        </button>
+        <button data-m="download">
+          <i class="fa-solid fa-file-arrow-down"></i
+          ><span>Download as Markdown</span>
+        </button>
+        <button data-m="import">
+          <i class="fa-solid fa-file-import"></i
+          ><span>Import .md / .txt files</span>
+        </button>
+        <hr />
+        <button data-m="spell">
+          <i class="fa-solid fa-spell-check"></i><span>Spell check</span
+          ><i class="fa-solid fa-check tick"></i>
+        </button>
+        <button data-m="tools">
+          <i class="fa-solid fa-text-height"></i><span>Show toolbar</span
+          ><i class="fa-solid fa-check tick"></i>
+        </button>
+        <button data-m="pintools">
+          <i class="fa-solid fa-thumbtack"></i><span>Pin toolbar</span
+          ><i class="fa-solid fa-check tick"></i>
+        </button>
+        <button data-m="tab">
+          <i class="fa-solid fa-up-right-and-down-left-from-center"></i
+          ><span>Open as full page</span>
+        </button>
+        <button data-m="settings">
+          <i class="fa-solid fa-gear"></i><span>Settings</span>
+        </button>
+      </div>
+      <div id="colorPop" class="pop" hidden></div>
+      <div id="nbPop" class="pop" hidden></div>
+      <div id="ctxMenu" class="pop" hidden></div>
+      <div id="drop" hidden>
+        <div>
+          <i class="fa-solid fa-file-import"></i><b>Drop to import</b
+          ><span>.md and .txt files become notes</span>
+        </div>
+      </div>
+      <input
+        type="file"
+        id="importFile"
+        accept=".md,.markdown,.txt,text/markdown,text/plain"
+        multiple
+        hidden
+      />
+      <div id="toast" role="status" hidden></div>
     </div>
-    <label class="search"><i class="fa-solid fa-magnifying-glass"></i>
-      <input id="search" type="search" placeholder="Search titles and content" autocomplete="off"></label>
-    <nav id="cats" aria-label="Folders"></nav>
-    <ul id="list"></ul>
-    <div class="d-foot">
-      <button id="settingsBtn" class="ghost"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
-      <button id="importBtn" class="ib" title="Import .md or .txt files as notes"><i class="fa-solid fa-file-import"></i></button>
-      <button id="tabBtn" class="ib" title="Open as a full page"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
-    </div>
-  </aside>
-
-  <main id="pane">
-    <header id="top">
-      <button id="menuBtn" class="ib" title="All notes"><i class="fa-solid fa-bars"></i></button>
-      <input id="title" placeholder="Untitled note" spellcheck="true" aria-label="Note title">
-      <button id="toolsBtn" class="ib" title="Hide toolbar"><i class="fa-solid fa-text-height"></i></button>
-      <button id="pinBtn" class="ib" title="Pin"><i class="fa-solid fa-thumbtack"></i></button>
-      <button id="favBtn" class="ib" title="Favorite"><i class="fa-regular fa-star"></i></button>
-      <button id="moreBtn" class="ib" title="More"><i class="fa-solid fa-ellipsis"></i></button>
-    </header>
-
-    <div id="trashBar" hidden>
-      <i class="fa-solid fa-trash-can"></i><span>This note is in the Trash.</span>
-      <button id="restoreBtn" class="ghost">Restore</button>
-      <button id="purgeBtn" class="ghost danger">Delete forever</button>
-    </div>
-
-    <div id="tools" role="toolbar" aria-label="Formatting">
-      <div class="grp">
-        <select id="fontSel" title="Font"></select>
-        <select id="sizeSel" title="Font size"></select>
-        <button class="step dec" data-cmd="sizeDown" aria-label="Smaller text"><span class="stp"><span class="a">A</span><span class="pm">−</span></span></button>
-        <button class="step inc" data-cmd="sizeUp" aria-label="Larger text"><span class="stp"><span class="a">A</span><span class="pm">+</span></span></button>
-      </div>
-      <div class="grp">
-        <button data-cmd="bold"><i class="fa-solid fa-bold"></i></button>
-        <button data-cmd="italic"><i class="fa-solid fa-italic"></i></button>
-        <button data-cmd="underline"><i class="fa-solid fa-underline"></i></button>
-        <button data-cmd="strike"><i class="fa-solid fa-strikethrough"></i></button>
-        <button data-cmd="textColor"><i class="fa-solid fa-font"></i></button>
-        <button data-cmd="highlight"><i class="fa-solid fa-highlighter"></i></button>
-      </div>
-      <div class="grp">
-        <button data-cmd="h1" class="t">H1</button>
-        <button data-cmd="h2" class="t">H2</button>
-        <button data-cmd="p"><i class="fa-solid fa-paragraph"></i></button>
-      </div>
-      <div class="grp">
-        <button data-cmd="ul"><i class="fa-solid fa-list-ul"></i></button>
-        <button data-cmd="ol"><i class="fa-solid fa-list-ol"></i></button>
-        <button data-cmd="check"><i class="fa-regular fa-square-check"></i></button>
-        <button data-cmd="quote"><i class="fa-solid fa-quote-left"></i></button>
-      </div>
-      <div class="grp">
-        <button data-cmd="link"><i class="fa-solid fa-link"></i></button>
-        <button data-cmd="hr"><i class="fa-solid fa-minus"></i></button>
-        <button data-cmd="code"><i class="fa-solid fa-code"></i></button>
-      </div>
-      <div class="grp">
-        <button data-cmd="undo"><i class="fa-solid fa-rotate-left"></i></button>
-        <button data-cmd="redo"><i class="fa-solid fa-rotate-right"></i></button>
-        <button data-cmd="clear"><i class="fa-solid fa-eraser"></i></button>
-        <button data-cmd="spell"><i class="fa-solid fa-spell-check"></i></button>
-      </div>
-      <div class="grp end">
-        <button data-cmd="pinTools"><i class="fa-solid fa-thumbtack"></i></button>
-        <button data-cmd="toggleTools"><i class="fa-solid fa-eye-slash"></i></button>
-      </div>
-    </div>
-
-    <form id="linkbar" hidden>
-      <i class="fa-solid fa-link"></i>
-      <input id="linkUrl" placeholder="Paste a link and press Enter" autocomplete="off">
-      <button type="submit" class="ghost">Apply</button>
-      <button type="button" id="linkCancel" class="ghost">Cancel</button>
-    </form>
-
-
-    <div id="editor" contenteditable="true" spellcheck="true" data-placeholder="Start writing…" role="textbox" aria-multiline="true" aria-label="Note"></div>
-
-    <footer>
-      <span id="counts">
-        <span class="chip-s" title="Words"><i class="fa-solid fa-align-left"></i><b id="wc">0</b><em>words</em></span>
-        <span class="chip-s" title="Characters"><i class="fa-solid fa-font"></i><b id="cc">0</b><em>chars</em></span>
-        <span class="chip-s rt" title="Estimated reading time"><i class="fa-regular fa-hourglass-half"></i><b id="rt">0</b><em>min read</em></span>
-      </span>
-      <span id="meta"></span>
-      <span id="status"><i class="fa-solid fa-circle-check"></i><span>Auto-saved</span></span>
-    </footer>
-  </main>
-
-  <div id="menu" class="pop" hidden>
-    <button data-m="archive"><i class="fa-solid fa-box-archive"></i><span>Archive</span></button>
-    <button data-m="trash"><i class="fa-solid fa-trash-can"></i><span>Move to Trash</span></button>
-    <button data-m="pdf"><i class="fa-solid fa-file-pdf"></i><span>Print / save as PDF (A4)</span></button>
-    <button data-m="download"><i class="fa-solid fa-file-arrow-down"></i><span>Download as Markdown</span></button>
-    <button data-m="import"><i class="fa-solid fa-file-import"></i><span>Import .md / .txt files</span></button>
-    <hr>
-    <button data-m="spell"><i class="fa-solid fa-spell-check"></i><span>Spell check</span><i class="fa-solid fa-check tick"></i></button>
-    <button data-m="tools"><i class="fa-solid fa-text-height"></i><span>Show toolbar</span><i class="fa-solid fa-check tick"></i></button>
-    <button data-m="pintools"><i class="fa-solid fa-thumbtack"></i><span>Pin toolbar</span><i class="fa-solid fa-check tick"></i></button>
-    <button data-m="tab"><i class="fa-solid fa-up-right-and-down-left-from-center"></i><span>Open as full page</span></button>
-    <button data-m="settings"><i class="fa-solid fa-gear"></i><span>Settings</span></button>
-  </div>
-  <div id="colorPop" class="pop" hidden></div>
-  <div id="drop" hidden><div><i class="fa-solid fa-file-import"></i><b>Drop to import</b><span>.md and .txt files become notes</span></div></div>
-  <input type="file" id="importFile" accept=".md,.markdown,.txt,text/markdown,text/plain" multiple hidden>
-  <div id="toast" role="status" hidden></div>
-</div>
-<script src="shared.js"></script>
-<script src="app.js"></script>
-</body>
+    <script src="shared.js"></script>
+    <script src="app.js"></script>
+  </body>
 </html>

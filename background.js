@@ -1,5 +1,5 @@
 // Flynn Notes – service worker: open the side panel, global shortcuts, web clipper
-const esc = (s = '') => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const esc = (s = '') => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 const setup = () => chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
@@ -24,14 +24,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId !== 'flynn-clip' || !info.selectionText) return;
 
   const all = await chrome.storage.local.get(null);
-  let note = Object.entries(all).find(([k, v]) => k.startsWith('note:') && v.clips && !v.trashed)?.[1];
+  let note = Object.entries(all).find(([k, v]) => k.startsWith('note:') && v.clips && !v.trashed && !v.archived)?.[1];
   const now = Date.now();
   if (!note) {
     note = { id: uid(), title: 'Web clips', html: '', created: now, modified: now, pinned: false,
              favorite: false, archived: false, trashed: false, clips: true };
   }
   const url = info.pageUrl || tab.url || '';
-  note.html += `<blockquote>${esc(info.selectionText).replace(/\n+/g, '<br>')}</blockquote>` +
+  note.html = (note.html || '') + `<blockquote>${esc(info.selectionText).replace(/\n+/g, '<br>')}</blockquote>` +
                `<p><a href="${esc(url)}">${esc(tab.title || url)}</a> · ${esc(new Date(now).toLocaleString())}</p><hr><p><br></p>`;
   note.modified = now;
   await chrome.storage.local.set({ ['note:' + note.id]: note, activeSide: note.id });

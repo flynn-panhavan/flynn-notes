@@ -18,7 +18,8 @@ html, body { height: auto; background: #e9ebf2; color: #1c2233; }
 #doc h2 { font-size: 1.28em; line-height: 1.35; margin: .8em 0 .3em; font-weight: 700; break-after: avoid; }
 #doc ul, #doc ol { margin: 0 0 .6em; padding-left: 1.5em; }
 #doc li { break-inside: avoid; }
-#doc li::marker { color: var(--c-bullet, var(--accent)); }
+#doc li::marker { color: var(--c-bullet, var(--m-c, var(--accent))); font-weight: var(--m-w, inherit); font-style: var(--m-i, inherit); font-size: var(--m-s, inherit); font-family: var(--m-f, inherit); }
+#doc ol { list-style-type: decimal; } #doc ol ol { list-style-type: lower-alpha; } #doc ol ol ol { list-style-type: lower-roman; }
 #doc a { color: var(--c-link, var(--accent)); text-underline-offset: 3px; }
 #doc hr { border: 0; border-top: 1px solid #dfe3ef; margin: 1.2em 0; }
 #doc blockquote { margin: .7em 0; padding: .2em 0 .2em 1em; border-left: 3px solid var(--c-quote, var(--accent)); color: #667089; break-inside: avoid; }

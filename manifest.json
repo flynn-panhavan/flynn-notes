@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Flynn Notes",
-  "version": "2.2.0",
+  "version": "2.4.2",
   "description": "A modern notepad that lives in your browser's right-side panel. Fast writing, folder saving, your fonts, your shortcuts.",
   "permissions": ["storage", "unlimitedStorage", "sidePanel", "contextMenus", "activeTab"],
   "action": {
