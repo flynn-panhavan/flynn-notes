@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flynn Notes</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+<body data-mode="popup">
+<div id="app">
+  <div id="scrim" hidden></div>
+
+  <aside id="drawer" aria-label="Notes">
+    <div class="d-head">
+      <label class="search"><span class="ic" data-i="search"></span>
+        <input id="search" type="search" placeholder="Search titles and content" autocomplete="off"></label>
+      <button id="newBtn" class="btn-new" title="New note (Alt+N)"><span class="ic" data-i="plus"></span>New</button>
+    </div>
+    <nav id="cats" aria-label="Folders"></nav>
+    <ul id="list"></ul>
+  </aside>
+
+  <main id="pane">
+    <header id="top">
+      <button id="menuBtn" class="ib" title="All notes"><span class="ic" data-i="menu"></span></button>
+      <input id="title" placeholder="Untitled note" spellcheck="false" aria-label="Note title">
+      <button id="sideBtn" class="ib popup-only" title="Open side note (Alt+Shift+S)"><span class="ic" data-i="panel"></span></button>
+      <button id="setBtn" class="ib" title="Settings"><span class="ic" data-i="sliders"></span><i class="dot" hidden></i></button>
+    </header>
+
+    <div id="tools" role="toolbar" aria-label="Formatting">
+      <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+      <button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+      <button data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+      <button data-cmd="strike" title="Strikethrough"><s>S</s></button>
+      <span class="sep"></span>
+      <button data-cmd="h1" title="Heading 1">H1</button>
+      <button data-cmd="h2" title="Heading 2">H2</button>
+      <button data-cmd="p" title="Paragraph">¶</button>
+      <span class="sep"></span>
+      <button data-cmd="ul" title="Bullet list (Ctrl+Shift+8)"><span class="ic" data-i="ul"></span></button>
+      <button data-cmd="ol" title="Numbered list (Ctrl+Shift+7)"><span class="ic" data-i="ol"></span></button>
+      <button data-cmd="check" title="Checklist (Ctrl+Shift+9)"><span class="ic" data-i="check"></span></button>
+      <span class="sep"></span>
+      <button data-cmd="undo" title="Undo (Ctrl+Z)"><span class="ic" data-i="undo"></span></button>
+      <button data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><span class="ic" data-i="redo"></span></button>
+      <button data-cmd="clear" title="Clear formatting">Tx</button>
+      <span class="sep"></span>
+      <button data-cmd="link" title="Insert link (Ctrl+K)"><span class="ic" data-i="link"></span></button>
+      <button data-cmd="hr" title="Horizontal line"><span class="ic" data-i="hr"></span></button>
+      <button data-cmd="code" title="Code block"><span class="ic" data-i="code"></span></button>
+    </div>
+
+    <form id="linkbar" hidden>
+      <input id="linkUrl" placeholder="Paste a link and press Enter" autocomplete="off">
+      <button type="submit" class="txt">Apply</button>
+      <button type="button" id="linkCancel" class="txt">Cancel</button>
+    </form>
+
+    <div id="meta-row">
+      <input id="tags" placeholder="Add tags, separated by commas" spellcheck="false" aria-label="Tags">
+      <div class="acts">
+        <button id="pinBtn" class="ib sm" title="Pin"><span class="ic" data-i="pin"></span></button>
+        <button id="favBtn" class="ib sm" title="Favorite"><span class="ic" data-i="star"></span></button>
+        <button id="archBtn" class="ib sm" title="Archive"><span class="ic" data-i="archive"></span></button>
+        <button id="trashBtn" class="ib sm" title="Move to trash"><span class="ic" data-i="trash"></span></button>
+        <button id="restoreBtn" class="txt" hidden>Restore</button>
+        <button id="purgeBtn" class="txt danger" hidden>Delete forever</button>
+      </div>
+    </div>
+
+    <div id="editor" contenteditable="true" spellcheck="true" data-placeholder="Start writing…" role="textbox" aria-multiline="true" aria-label="Note"></div>
+
+    <footer>
+      <span id="counts"></span>
+      <span id="meta"></span>
+      <span id="status">Saved</span>
+    </footer>
+
+    <section id="settings" hidden>
+      <h3>Theme</h3>
+      <div class="seg" id="themes">
+        <button data-theme="light">Light</button>
+        <button data-theme="dark">Dark</button>
+        <button data-theme="anime">Anime Night</button>
+      </div>
+      <h3>Save to a folder</h3>
+      <p id="fsText"></p>
+      <div class="row" id="fsBtns"></div>
+      <h3>Backup</h3>
+      <div class="row"><button id="exportBtn" class="txt">Export all notes (.json)</button></div>
+      <p class="hint">Alt+Shift+N quick note · Alt+Shift+S side note · Alt+N new note. Change these at chrome://extensions/shortcuts.</p>
+    </section>
+  </main>
+  <div id="toast" role="status" hidden></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

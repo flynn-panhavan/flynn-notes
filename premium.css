@@ -11,7 +11,6 @@
   --grad-text: linear-gradient(120deg, #2f3fe0 0%, #7a49ee 100%);
   --glass: rgba(255, 255, 255, 0.74);
   --glass-solid: rgba(250, 251, 255, 0.9);
-  --pop-bg: rgba(252, 252, 255, 0.98);
   --hl: inset 0 1px 0 rgba(255, 255, 255, 0.85);
   --glow: 0 10px 28px -8px rgba(86, 98, 255, 0.5);
   --glow-sm: 0 4px 14px -3px rgba(86, 98, 255, 0.45);
@@ -32,7 +31,6 @@
   --grad-text: linear-gradient(120deg, #a9b6ff 0%, #d0aaff 100%);
   --glass: rgba(24, 28, 42, 0.7);
   --glass-solid: rgba(24, 28, 42, 0.92);
-  --pop-bg: rgba(26, 30, 46, 0.98);
   --hl: inset 0 1px 0 rgba(255, 255, 255, 0.07);
   --glow: 0 10px 28px -8px rgba(131, 150, 255, 0.5);
   --glow-sm: 0 4px 14px -3px rgba(131, 150, 255, 0.45);
@@ -48,7 +46,6 @@
   --grad-text: linear-gradient(120deg, #ffb3da 0%, #cdb0ff 55%, #9be8ff 100%);
   --glass: rgba(38, 26, 88, 0.58);
   --glass-solid: rgba(38, 26, 88, 0.92);
-  --pop-bg: rgba(38, 27, 90, 0.98);
   --hl: inset 0 1px 0 rgba(255, 255, 255, 0.09);
   --glow: 0 10px 30px -8px rgba(255, 143, 199, 0.55);
   --glow-sm: 0 4px 16px -3px rgba(255, 143, 199, 0.5);
@@ -195,7 +192,7 @@ body {
 #nbPop,
 #ctxMenu,
 #colorPop {
-  background: var(--pop-bg);
+  background: var(--glass-solid);
   border: 1px solid transparent;
   background-clip: padding-box;
   border-radius: 16px;
@@ -521,8 +518,6 @@ footer {
 }
 #toast {
   background: var(--glass-solid);
-  color: var(--ink);
-  font-weight: 600;
   backdrop-filter: blur(14px);
   border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line));
   box-shadow: var(--shadow), var(--glow-sm);
