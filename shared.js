@@ -259,17 +259,55 @@ const FS = {
     this.state = (await this.dir.requestPermission({ mode: 'readwrite' })) === 'granted' ? 'ready' : 'needs';
   },
   async disconnect() { this.dir = null; this.state = 'none'; await kv('readwrite', s => s.delete('dir')); },
-  fileName: n => (titleOf(n).replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').trim().slice(0, 60) || 'Untitled') + ` [${n.id.slice(-4)}].md`,
-  async remove(n) { if (this.state === 'ready' && n.file) { try { await this.dir.removeEntry(n.file); } catch { /* already gone */ } } },
-  // returns the file name written, or undefined when nothing was written
+  // File name = the note's own title (e.g. "Shopping list.md"). `copy` > 1 adds " (2)", " (3)" only when two notes share a title.
+  fileName: (n, copy = 1) => (titleOf(n).replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').replace(/[. ]+$/, '').trim().slice(0, 60) || 'Untitled') + (copy > 1 ? ` (${copy})` : '') + '.md',
+  // pick a free name in this folder: keep our own file, otherwise skip names used by another note or an existing file
+  async uniqueName(n, h, dname) {
+    const others = Object.values(await loadNotes()).filter(m => m.id !== n.id && !m.trashed);
+    for (let c = 1; c < 500; c++) {
+      const name = this.fileName(n, c);
+      if (n.file === name && (n.fdir || '') === dname) return name;
+      // case-insensitive disks (Windows, macOS): "note.md" and "Note.md" are the same file, so keep our own file instead of making "Note (2).md"
+      if (n.file && (n.fdir || '') === dname && n.file.toLowerCase() === name.toLowerCase()) return n.file;
+      if (others.some(m => m.file === name && (m.fdir || '') === dname)) continue;
+      try { await h.getFileHandle(name); } catch { return name; } // not found = free
+    }
+    return this.fileName(n, 1);
+  },
+  // Each notebook is a subfolder of the chosen folder; notes with no notebook live in the root.
+  dirName: b => (String(b.name || '').replace(/[\\/:*?"<>|\u0000-\u001f]+/g, '').trim().replace(/[. ]+$/, '').slice(0, 60) || 'Notebook'),
+  async dirFor(n) {
+    const b = n.nb && NOTEBOOKS[n.nb];
+    if (!b) return { h: this.dir, name: '' };
+    const name = this.dirName(b);
+    return { h: await this.dir.getDirectoryHandle(name, { create: true }), name };
+  },
+  // create the notebook's folder right away (also for empty notebooks)
+  async ensureNotebook(b) {
+    if (this.state !== 'ready' || !b) return;
+    try { await this.dir.getDirectoryHandle(this.dirName(b), { create: true }); } catch { this.state = 'needs'; }
+  },
+  // remove a notebook folder, only if it is empty (never deletes anything else)
+  async removeNotebookDir(name) {
+    if (this.state !== 'ready' || !name) return;
+    try { await this.dir.removeEntry(name); } catch { /* not empty or already gone */ }
+  },
+  async remove(n) {
+    if (this.state === 'ready' && n.file) {
+      try { const d = n.fdir ? await this.dir.getDirectoryHandle(n.fdir) : this.dir; await d.removeEntry(n.file); } catch { /* already gone */ }
+    }
+  },
+  // returns the file name written, or undefined when nothing was written; also sets n.fdir (folder name)
   async write(n) {
     if (this.state !== 'ready') return undefined;
     try {
       if (n.trashed) { await this.remove(n); return undefined; }
-      const name = this.fileName(n);
-      const fh = await this.dir.getFileHandle(name, { create: true });
+      const { h, name: dname } = await this.dirFor(n);
+      const name = await this.uniqueName(n, h, dname);
+      const fh = await h.getFileHandle(name, { create: true });
       const w = await fh.createWritable(); await w.write(toMarkdown(n)); await w.close();
-      if (n.file && n.file !== name) await this.remove(n);
+      if (n.file && (n.file !== name || (n.fdir || '') !== dname)) await this.remove(n); // moved or renamed: drop the old copy
+      n.fdir = dname;
       return name;
     } catch { this.state = 'needs'; return undefined; }
   },
@@ -277,8 +315,9 @@ const FS = {
 // Save to extension storage and mirror to the chosen folder.
 async function saveNote(n) {
   await chrome.storage.local.set({ ['note:' + n.id]: n });
+  const before = (n.fdir || '') + '/' + (n.file || '');
   const f = await FS.write(n);
-  if (f && f !== n.file) { n.file = f; await chrome.storage.local.set({ ['note:' + n.id]: n }); }
+  if (f && (n.fdir || '') + '/' + f !== before) { n.file = f; await chrome.storage.local.set({ ['note:' + n.id]: n }); }
   return n;
 }
 

@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="app.css">
   <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="polish.css">
 </head>
 <body>
 <div id="app">
@@ -72,8 +73,8 @@
       <div class="grp">
         <select id="fontSel" title="Font"></select>
         <select id="sizeSel" title="Font size"></select>
-        <button data-cmd="sizeDown" class="t" title="Smaller text">A−</button>
-        <button data-cmd="sizeUp" class="t" title="Larger text">A+</button>
+        <button data-cmd="sizeDown" class="t step dec" title="Smaller text" aria-label="Smaller text">A−</button>
+        <button data-cmd="sizeUp" class="t step inc" title="Larger text" aria-label="Larger text">A+</button>
       </div>
       <div class="grp">
         <button data-cmd="bold"><i class="fa-solid fa-bold"></i></button>

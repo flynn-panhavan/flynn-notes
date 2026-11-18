@@ -565,7 +565,7 @@ function renderNotebooks() {
         return `<button data-nb="${b.id}" class="${on ? "on" : ""}" title="${mdEsc(b.name)}"><i class="fa-solid ${on ? "fa-book-open" : "fa-book"}"></i><span>${mdEsc(b.name)}</span><em>${counts[b.id] || 0}</em></button>`;
       })
       .join("") ||
-    '<p class="nb-empty">Notebooks are separate spaces for your notes. Press the folder button to make one.</p>';
+    '<p class="nb-empty">No notebooks yet. Use the folder button to create one.</p>';
   const b = curNb();
   $("#nbBar").hidden = !b;
   if (b) $("#nbName").textContent = b.name;
@@ -578,6 +578,7 @@ async function createNotebook(name) {
   const b = { id: uid(), name, created: Date.now() };
   NOTEBOOKS[b.id] = b;
   await chrome.storage.local.set({ ["nb:" + b.id]: b });
+  await FS.ensureNotebook(b);
   return b;
 }
 async function promptNotebook() {
@@ -603,9 +604,12 @@ async function renameNotebook() {
   )
     return toast("A notebook with that name already exists");
   await flush();
+  const oldDir = FS.dirName(b);
   b.name = name;
   await chrome.storage.local.set({ ["nb:" + b.id]: b });
+  await FS.ensureNotebook(b);
   for (const n of Object.values(notes)) if (n.nb === b.id) await saveNote(n);
+  if (FS.dirName(b) !== oldDir) await FS.removeNotebookDir(oldDir);
   renderList();
   updateMeta();
   toast("Notebook renamed");
@@ -630,6 +634,7 @@ async function deleteNotebook() {
     delete n.nb;
     await saveNote(n);
   }
+  await FS.removeNotebookDir(FS.dirName(b));
   view = "all";
   renderList(true);
   updateMeta();
@@ -941,10 +946,13 @@ ctxMenu.onclick = async (e) => {
       )
         return toast("A notebook with that name already exists");
       await flush();
+      const oldDir = FS.dirName(b);
       b.name = name;
       await chrome.storage.local.set({ ["nb:" + b.id]: b });
+      await FS.ensureNotebook(b);
       for (const n of Object.values(notes))
         if (n.nb === b.id) await saveNote(n);
+      if (FS.dirName(b) !== oldDir) await FS.removeNotebookDir(oldDir);
       renderList();
       updateMeta();
       toast("Notebook renamed");
@@ -980,6 +988,7 @@ ctxMenu.onclick = async (e) => {
         delete n.nb;
         await saveNote(n);
       }
+      await FS.removeNotebookDir(FS.dirName(b));
       if (view === "nb:" + b.id) view = "all";
       renderList(true);
       updateMeta();
@@ -1440,7 +1449,7 @@ function stepSize(dir) {
     b.classList.remove("bump");
     void b.offsetWidth;
   }
-  $(dir > 0 ? ".step.inc" : ".step.dec").classList.add("bump");
+  $(dir > 0 ? ".step.inc" : ".step.dec")?.classList.add("bump");
 }
 sizeSel.onchange = () => {
   applySize(sizeSel.value);
@@ -1811,7 +1820,7 @@ chrome.storage.onChanged.addListener((ch, area) => {
       const old = notes[id];
       // ignore late echoes of our own older saves
       if (old && (newValue.modified || 0) < (old.modified || 0)) continue;
-      if (old?.file && !newValue.file) newValue.file = old.file;
+      if (old?.file && !newValue.file) { newValue.file = old.file; newValue.fdir = old.fdir; }
       if (JSON.stringify(old) === JSON.stringify(newValue)) continue;
       const external =
         !old ||

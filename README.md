@@ -2,7 +2,7 @@
 
 A browser-based notepad for Chrome that opens in the right-side panel. Flynn Notes is designed for quick writing, organizing notes, collecting useful web selections, and keeping your notes available while browsing.
 
-> **Current version:** 2.4.2  
+> **Current version:** 2.5.0  
 > **Platform:** Google Chrome (Manifest V3)
 
 ## Features
@@ -10,14 +10,14 @@ A browser-based notepad for Chrome that opens in the right-side panel. Flynn Not
 - **Side-panel notes** — open Flynn Notes from the Chrome toolbar and write without leaving the current page.
 - **Quick access** — use keyboard shortcuts to open the panel or create a new note.
 - **Rich-text editor** — format text with bold, italic, underline, strikethrough, headings, lists, checklists, quotes, links, code, highlights, and text colors.
-- **Note organization** — search note titles and content, and organize notes with folders, favorites, pinning, archive, and trash.
+- **Note organization** — search note titles and content, and organize notes with notebooks, favorites, pinning, archive, and trash.
 - **Save, Back and Next buttons** — a bar above the editor always shows Back (undo), Next (redo) and Save, even when the formatting toolbar is hidden.
 - **Choose how saving works** — Settings → Editor → Saving: instantly, a set number of minutes after you start writing, or only when you press Save (`Ctrl + S`). Unsaved text is always kept as a draft and restored if you close the panel.
 - **Notebooks** — create notebooks as separate spaces for notes, move notes between them, rename or delete them. With a save folder connected, each notebook becomes a subfolder of Markdown files.
 - **Web clipping** — select text on a webpage, right-click, and save the selection to Flynn Notes with its page link.
-- **Import and export** — import `.md` and `.txt` files, download individual notes as Markdown, and use the storage settings to export or import a notes backup.
+- **Import and export** — import `.md` and `.txt` files, download individual notes as Markdown (the file is named exactly like the note), and use the storage settings to export or import a notes backup.
 - **Print and PDF** — print a note or save it as a PDF using the browser print dialog, with A4 formatting.
-- **Premium look** — gradient accents, frosted-glass panels, soft ambient light and spring animations in every theme. **Anime Night** adds drifting sakura petals, twinkling stars, glowing details and an occasional shooting star.
+- **Premium look** — gradient accents, frosted-glass panels, soft ambient light and spring animations in every theme. **Anime Night** adds falling sakura petals, a drifting aurora, glowing links and favorites, and an occasional shooting star.
 - **Personalization** — configure themes, fonts, font sizes, editor colors, and animation preferences.
 - **Toolbar controls** — hide or pin the formatting toolbar and customize supported editor shortcuts in Settings.
 - **Writing statistics** — view word count, character count, and estimated reading time.
@@ -75,6 +75,7 @@ flynn-notes/
 ├── app.css             # Side-panel styling
 ├── base.css            # Shared styles
 ├── premium.css         # Premium visual layer: gradients, glass, anime effects, motion
+├── polish.css          # Final polish layer: flat toolbar, calm lists, focus and contrast
 ├── shared.js           # Shared storage and utility functions
 ├── options.html        # Settings page
 ├── options.js          # Settings behavior
@@ -107,6 +108,32 @@ The extension requests these Chrome permissions:
 - Bundled local fonts and Font Awesome icons
 
 ## Version history
+
+### 2.5.0
+
+- Cleaner, more professional look: the formatting toolbar is now a flat strip under the header instead of a floating card, Back / Next are quiet buttons and Save is the single highlighted action.
+- Footer is easier to read: plain "words · chars · min read" text, one colored status icon (green saved, amber saving, accent unsaved), and the "Edited" text hides in narrow panels instead of being cut off.
+- Notes list: the selected note uses a calm tinted highlight instead of a glowing gradient border; hover no longer moves cards.
+- Buttons and menus no longer jump on hover; popovers open without the bounce.
+- One consistent keyboard focus ring, plus support for high-contrast and forced-colors modes.
+- Shorter empty-notebooks hint.
+
+### 2.4.5
+
+- Fixed a file-name clash on Windows and macOS: changing only the capitalization of a note's title (for example `note` → `Note`) no longer creates `Note (2).md`; the note keeps its existing file.
+- Removed an unused leftover page (`popup.html`) and a duplicated list-marker style rule. No change to how the extension looks or works.
+- Corrected the README: notes are organized in notebooks (not folders), the Anime Night description matches what it actually does, and the notes for 2.4.4 below are reworded to match the code.
+
+### 2.4.4
+
+- Markdown files are now named exactly like the note (for example `Shopping list.md`) instead of ending in an `[xxxx]` ID tag, both for "Download as Markdown" and in the save folder. In the save folder, notes with the same title get `Title (2).md`, and existing files are renamed the next time the note is saved.
+- Fixed the "No highlight" / "Default text color" button in the color picker: it now spans the full width above the 6 × 2 grid of colors.
+- Fixed bullets and numbers not following the text: when the first words of a list item are bold, italic, colored or a different size or font, the bullet or number now matches in the editor too (this already worked in print).
+- Menus, pickers and the notes drawer now use a 97% opaque background so note text no longer shows through.
+
+### 2.4.3
+
+- Fixed notebooks not being created as subfolders in the save folder: new notebooks (even empty ones) get a folder immediately, notes are saved inside their notebook folder, and renaming, moving or deleting a notebook updates the folders.
 
 ### 2.4.2
 

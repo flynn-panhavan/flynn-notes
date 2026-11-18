@@ -96,7 +96,6 @@
 #editor h1 { font-size: 1.6em; line-height: 1.3; margin: .85em 0 .3em; font-weight: 700; letter-spacing: -.015em; }
 #editor h2 { font-size: 1.28em; line-height: 1.35; margin: .8em 0 .3em; font-weight: 700; letter-spacing: -.01em; }
 #editor ul, #editor ol { margin: 0 0 .6em; padding-left: 1.5em; }
-#editor li::marker { color: var(--accent); }
 #editor a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
 #editor hr { border: 0; border-top: 1px solid var(--line); margin: 1.2em 0; }
 #editor blockquote { margin: .7em 0; padding: .2em 0 .2em 1em; border-left: 3px solid var(--accent); color: var(--muted); }
@@ -124,7 +123,8 @@ footer { display: flex; align-items: center; gap: 14px; padding: 0 var(--gutter)
 #menu hr { border: 0; border-top: 1px solid var(--line); margin: 5px 4px; }
 #colorPop { min-width: 0; width: 214px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; padding: 12px; }
 #colorPop button { aspect-ratio: 1; border-radius: 9px; border: 1px solid rgba(0, 0, 0, .12); transition: transform .1s; }
-#colorPop button.none { display: grid; place-items: center; background: var(--bg); color: var(--muted); font-size: 12px; }
+#colorPop button.none { grid-column: 1 / -1; aspect-ratio: auto; height: 32px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 10px; background: var(--bg); color: var(--ink); font-size: 12.5px; }
+#colorPop button.none:hover { transform: none; }
 #colorPop button:hover { transform: scale(1.12); }
 #toast { position: absolute; z-index: 40; left: 50%; bottom: 52px; transform: translateX(-50%); max-width: 90%; padding: 10px 16px; border-radius: 12px; background: var(--ink); color: var(--bg); font-size: 13px; font-weight: 500; box-shadow: var(--shadow); animation: pop .14s ease-out; }
 @media (prefers-reduced-motion: reduce) { #drawer { transition: none; } }
@@ -168,10 +168,25 @@ footer { display: flex; align-items: center; gap: 14px; padding: 0 var(--gutter)
 #drop i { font-size: 30px; margin-bottom: 8px; }
 /* editor colors chosen in Settings (fall back to the theme colors) */
 #editor { color: var(--c-text, inherit); }
-#editor li::marker { color: var(--c-bullet, var(--accent)); }
+#editor li::marker { color: var(--c-bullet, var(--m-c, var(--accent))); font-weight: var(--m-w, inherit); font-style: var(--m-i, inherit); font-size: var(--m-s, inherit); font-family: var(--m-f, inherit); }
 #editor a { color: var(--c-link, var(--accent)); }
 #editor blockquote { border-left-color: var(--c-quote, var(--accent)); }
 #editor ul.check li.done::before { border-color: var(--c-check, var(--accent)); background-color: var(--c-check, var(--accent)); }
 #editor pre, #editor code { background: var(--c-codeBg, var(--surface)); color: var(--c-codeInk, inherit); }
 #editor ::selection { background: var(--c-selection, var(--accent-soft)); }
 #list .fa-star.on, #list li .star { color: var(--c-star, var(--accent)); }
+
+/* A− / A+ size steppers */
+#tools button.step { min-width: 34px; height: 32px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); box-shadow: var(--shadow-sm); white-space: nowrap; }
+#tools .grp:first-child { flex-wrap: nowrap; }
+#tools .grp:first-child .step { flex: none; }
+#tools button.step:hover { border-color: var(--line-2); }
+#tools button.step.bump { animation: step-bump .28s ease-out; }
+@keyframes step-bump { 40% { transform: scale(1.15); background: var(--accent-soft); color: var(--accent); } }
+
+/* keep the font / size / A− / A+ row inside the toolbar box */
+#tools .grp:first-child { min-width: 0; max-width: 100%; }
+#tools select#fontSel { flex: 1 1 0; width: 0; min-width: 0; max-width: 240px; }
+#tools select#sizeSel { width: 62px; flex: none; padding-right: 22px; }
+#tools .grp:first-child .step { min-width: 32px; padding: 0 4px; }
+@media (min-width: 720px) { #tools select#fontSel { width: 190px; flex: 0 1 190px; } }

@@ -1,0 +1,86 @@
+/* Flynn Notes – professional polish layer (loads last).
+   Calmer surfaces, clearer hierarchy, quieter motion, consistent focus. Behavior is unchanged. */
+
+:root {
+  --ring: 0 0 0 2px var(--bg, #fff), 0 0 0 4px color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+/* ---------- Focus: one clear keyboard ring everywhere ---------- */
+#editor:focus-visible, #title:focus-visible { box-shadow: none; }
+
+/* ---------- Quieter hover motion (no jumping controls) ---------- */
+.ib:hover, #tools button:hover, #actbar .act:hover { transform: none; }
+.ib:active, #tools button:active, #actbar .act:active { transform: scale(.96); }
+
+/* ---------- Action bar: Back / Next are quiet, Save is the one primary control ---------- */
+#actbar { margin-top: 2px; }
+#actbar .act { background: transparent; border-color: transparent; box-shadow: none; color: var(--muted); backdrop-filter: none; }
+#actbar .act:hover { background: var(--surface-2); color: var(--ink); }
+#actbar .act.save { color: var(--ink); border-color: var(--line); background: var(--bg); }
+#actbar .act.save.dirty { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+#actbar .act:disabled { opacity: .4; }
+
+/* ---------- Formatting toolbar: flat strip instead of a floating card ---------- */
+#tools {
+  margin: 4px 0 0;
+  padding: 6px var(--gutter) 8px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#tools .grp:first-child { border-bottom: 0; padding-bottom: 2px; margin-bottom: 0; }
+#tools button { border-radius: 8px; }
+#tools button.on { background: var(--accent-soft); box-shadow: none; color: var(--accent); }
+#tools button.step { box-shadow: none; }
+#tools select { border-radius: 9px; box-shadow: none; }
+
+/* ---------- Footer: plain readable stats ---------- */
+footer { height: 34px; gap: 12px; }
+#counts { display: inline-flex; align-items: center; gap: 0; }
+#counts .chip-s { display: inline-flex; align-items: baseline; gap: 4px; padding: 0; background: none; border: 0; box-shadow: none; border-radius: 0; }
+#counts .chip-s i { display: none; }
+#counts .chip-s b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+#counts .chip-s em { font-style: normal; }
+#counts .chip-s + .chip-s::before { content: "·"; margin: 0 8px; opacity: .6; }
+#status { padding: 0; background: none; }
+#status::before { display: none; }
+#status i { margin-right: 6px; color: var(--ok); }
+#status.busy i { color: #e5a02e; }
+#status.unsaved i { color: var(--accent); }
+@media (max-width: 480px) { #meta { display: none; } footer { justify-content: space-between; } }
+
+/* ---------- Notes list: calm selected state, easier scanning ---------- */
+#list li { border-radius: 10px; margin-bottom: 2px; }
+#list li:hover { transform: none; background: var(--surface-2); box-shadow: none; }
+#list li.on, [data-theme="dark"] #list li.on, [data-theme="anime"] #list li.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line, color-mix(in srgb, var(--accent) 30%, transparent));
+  box-shadow: none;
+}
+#list li.on::before { background: var(--accent); box-shadow: none; }
+.li-s { line-height: 1.4; }
+
+/* ---------- Drawer / popovers: lighter shadow, no entrance bounce ---------- */
+.pop, #menu, #nbPop, #ctxMenu, #colorPop { border-radius: 12px; animation: pop .12s ease-out; }
+#menu button, #nbPop button, #ctxMenu button { min-height: 34px; }
+
+/* ---------- Notebook hint: short and quiet ---------- */
+.nb-empty { line-height: 1.4; }
+
+/* ---------- Type: crisper reading text ---------- */
+#editor { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+#title { letter-spacing: -.01em; }
+
+/* ---------- Accessibility ---------- */
+@media (prefers-contrast: more) {
+  :root { --line: color-mix(in srgb, var(--ink) 35%, transparent); }
+  .pop, #menu, #nbPop, #ctxMenu, #colorPop, #tools, footer { border-color: var(--ink); }
+}
+@media (forced-colors: active) {
+  #list li.on { outline: 2px solid Highlight; }
+  #actbar .act.save.dirty { outline: 2px solid Highlight; }
+}

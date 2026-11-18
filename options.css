@@ -182,3 +182,19 @@ input[type="range"] { width: 100%; accent-color: var(--accent); height: 22px; }
   .font { flex-wrap: wrap; gap: 6px 12px; } .font .nm { width: auto; flex: 1; } .font .pv { order: 3; flex-basis: 100%; }
   .sc { flex-wrap: wrap; } .sc .nm { width: 100%; }
 }
+
+/* colors page: label above, swatches in a wrapping row */
+.crow { padding: 14px 0; border-top: 1px solid var(--line); }
+.crow:first-of-type { border-top: 0; padding-top: 0; }
+.crow:last-child { padding-bottom: 0; }
+.crow .ct { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+.crow .ct b { font-size: 14px; }
+.crow .ct small { color: var(--muted); font-size: 12.5px; }
+.swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.dotc { flex: none; padding: 0; cursor: pointer; }
+.dotc.sm { width: 30px; height: 30px; font-size: 12px; }
+.swatches input[type="color"], .swatches .cpick { width: 30px; height: 30px; flex: none; }
+
+/* shortcuts page: masonry columns so uneven cards leave no empty gaps */
+#shortcuts .grid { display: block; columns: 440px; column-gap: 20px; }
+#shortcuts .grid > .card { break-inside: avoid; margin: 0 0 20px; display: inline-block; width: 100%; }

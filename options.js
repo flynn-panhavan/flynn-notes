@@ -614,13 +614,14 @@ function renderStorage() {
               created: n.created || Date.now(),
             };
             await chrome.storage.local.set({ ["nb:" + n.id]: NOTEBOOKS[n.id] });
+            await FS.ensureNotebook(NOTEBOOKS[n.id]);
           }
           continue;
         }
         if (!n || typeof n.id !== "string" || typeof n.html !== "string")
           continue;
         if (notes[n.id] && notes[n.id].modified >= (n.modified || 0)) continue;
-        const { file, tags, ...rest } = n; // folder paths belong to the exporting computer
+        const { file, fdir, tags, ...rest } = n; // folder paths belong to the exporting computer
         notes[n.id] = await saveNote({
           title: "",
           created: Date.now(),
@@ -639,9 +640,11 @@ function renderStorage() {
 async function syncAll() {
   notes = await loadNotes();
   await loadNotebooks();
+  for (const b of Object.values(NOTEBOOKS)) await FS.ensureNotebook(b);
   for (const n of Object.values(notes)) {
+    const before = (n.fdir || "") + "/" + (n.file || "");
     const f = await FS.write(n);
-    if (f && f !== n.file) {
+    if (f && (n.fdir || "") + "/" + f !== before) {
       n.file = f;
       await chrome.storage.local.set({ ["note:" + n.id]: n });
     }
