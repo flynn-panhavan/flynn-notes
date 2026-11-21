@@ -1,20 +1,24 @@
 {
   "manifest_version": 3,
   "name": "Flynn Notes",
-  "version": "2.5.0",
+  "version": "2.8.0",
   "description": "A modern notepad that lives in your browser's right-side panel. Fast writing, folder saving, your fonts, your shortcuts.",
   "permissions": ["storage", "unlimitedStorage", "sidePanel", "contextMenus", "activeTab"],
   "action": {
     "default_title": "Open Flynn Notes",
     "default_icon": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
   },
-  "side_panel": { "default_path": "sidepanel.html" },
-  "options_ui": { "page": "options.html", "open_in_tab": true },
-  "background": { "service_worker": "background.js" },
+  "side_panel": { "default_path": "pages/sidepanel.html" },
+  "options_ui": { "page": "pages/options.html", "open_in_tab": true },
+  "background": { "service_worker": "js/background.js" },
   "commands": {
     "open-side-panel": {
       "suggested_key": { "default": "Alt+Shift+S" },
       "description": "Open Flynn Notes side panel"
+    },
+    "open-full-page": {
+      "suggested_key": { "default": "Alt+Shift+F" },
+      "description": "Open Flynn Notes as a full page"
     },
     "new-note": {
       "suggested_key": { "default": "Alt+Shift+N" },

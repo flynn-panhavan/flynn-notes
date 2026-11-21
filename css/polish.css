@@ -2,7 +2,7 @@
    Calmer surfaces, clearer hierarchy, quieter motion, consistent focus. Behavior is unchanged. */
 
 :root {
-  --ring: 0 0 0 2px var(--bg, #fff), 0 0 0 4px color-mix(in srgb, var(--accent) 70%, transparent);
+  --ring: 0 0 0 2px var(--bg), 0 0 0 4px rgba(var(--accent-rgb), .7);
 }
 
 /* ---------- Focus: one clear keyboard ring everywhere ---------- */
@@ -49,7 +49,7 @@ footer { height: 34px; gap: 12px; }
 #status { padding: 0; background: none; }
 #status::before { display: none; }
 #status i { margin-right: 6px; color: var(--ok); }
-#status.busy i { color: #e5a02e; }
+#status.busy i { color: var(--warn); }
 #status.unsaved i { color: var(--accent); }
 @media (max-width: 480px) { #meta { display: none; } footer { justify-content: space-between; } }
 
@@ -84,3 +84,22 @@ footer { height: 34px; gap: 12px; }
   #list li.on { outline: 2px solid Highlight; }
   #actbar .act.save.dirty { outline: 2px solid Highlight; }
 }
+
+/* ---------- Soft Glass Motion bridge (sg-motion.css) ---------- */
+#importBtn.sg-spinbtn .sg-spinbtn-spin { color: var(--accent); }
+#saveBtn.sg-spinbtn .sg-spinbtn-spin { color: var(--muted); }
+#saveBtn.dirty .sg-spinbtn-spin { color: var(--accent-ink); }
+#saveBtn.sg-spinbtn { transition: background .25s, border-color .25s, color .25s, transform .2s var(--sg-ease); }
+#saveBtn.flash { animation: sg-ping .9s ease-out 1; }
+#saveBtn.flash > i:first-child { animation: sg-pop .55s var(--sg-ease); }
+#status span.sg-swap { display: inline-block; }
+
+/* The Animation setting (Lively / Subtle / Off) also governs the kit.
+   Lively: everything. Subtle: state changes and fades only, no loops or bursts. Off: no movement. */
+[data-motion="subtle"] #saveBtn.flash, [data-motion="subtle"] #saveBtn.flash > i { animation: none; }
+[data-motion="subtle"] .sg-glide::before { transition-duration: .2s; }
+[data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
+  animation-duration: .001ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important;
+  transition-duration: .001ms !important; transition-delay: 0s !important;
+}
+[data-motion="off"] .sg-spinbtn-spin { animation: sg-spin .7s linear infinite !important; } /* loading must stay visible */

@@ -56,8 +56,9 @@ function toast(msg) {
 const setStatus = (txt, busy, icon) => {
   const s = $("#status"),
     i = s.querySelector("i");
-  s.querySelector("span").textContent = txt;
+  SGM.swapText(s.querySelector("span"), txt);
   s.classList.toggle("busy", !!busy);
+  $("#saveBtn").classList.toggle("loading", !!busy);
   s.classList.toggle("unsaved", icon === "fa-pen");
   $("footer").classList.toggle("saving", !!busy);
   const cls =
@@ -286,8 +287,16 @@ async function persist(n) {
 function paintSave() {
   const b = $("#saveBtn"),
     k = keysFor(prefs, "save")[0];
+  const wasDirty = b.classList.contains("dirty");
   b.classList.toggle("dirty", dirty);
-  b.querySelector("span").textContent = dirty ? "Save" : "Saved";
+  SGM.swapText(b.querySelector("span"), dirty ? "Save" : "Saved");
+  if (wasDirty && !dirty) {
+    // saved: one ring pulse and a pop on the icon
+    b.classList.remove("flash");
+    void b.offsetWidth;
+    b.classList.add("flash");
+    setTimeout(() => b.classList.remove("flash"), 1000);
+  }
   b.title = (dirty ? "Save now" : "All changes saved") + (k ? ` (${k})` : "");
 }
 function scheduleSave() {
@@ -729,8 +738,10 @@ const pickImport = () => importInput.click();
 async function importFiles(files) {
   files = [...files];
   if (!files.length) return;
+  const ib = $("#importBtn");
+  ib.classList.add("loading");
   await leave();
-  const res = await importTextFiles(files);
+  const res = await importTextFiles(files).finally(() => ib.classList.remove("loading"));
   for (const n of res.added) notes[n.id] = n;
   toast(importMessage(res));
   if (res.added.length) {
@@ -775,13 +786,20 @@ async function printNote() {
   await flush();
   if (!notes[activeId]) return;
   chrome.tabs.create({
-    url: chrome.runtime.getURL("print.html?id=" + encodeURIComponent(activeId)),
+    url: chrome.runtime.getURL("pages/print.html?id=" + encodeURIComponent(activeId)),
   });
 }
-const openTab = () =>
-  chrome.tabs.create({ url: chrome.runtime.getURL("sidepanel.html") });
+const openTab = async () => {
+  // Already a full page? Then there is no side panel to hide, and we must not close ourselves.
+  const here = await chrome.tabs.getCurrent();
+  await chrome.tabs.create({ url: chrome.runtime.getURL("pages/sidepanel.html") });
+  if (here) return;
+  await flush();
+  window.close(); // closes the side panel
+};
 $("#settingsBtn").onclick = openSettings;
 $("#tabBtn").onclick = openTab;
+$("#fullBtn").onclick = openTab;
 
 titleEl.addEventListener("input", touch);
 titleEl.addEventListener("keydown", (e) => {

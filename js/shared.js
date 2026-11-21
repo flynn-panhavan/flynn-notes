@@ -14,8 +14,10 @@ const FONTS = {
 const firstFont = stack => stack.split(',')[0].replace(/["']/g, '').trim();
 
 /* ---------- preferences ---------- */
+const ACCENTS = ['terracotta', 'blue', 'lavender', 'teal'];
 const DEFAULT_PREFS = {
   theme: 'light',            // light | dark | anime
+  accent: 'terracotta',      // terracotta | blue | lavender | teal (Soft Glass accents; ignored by anime)
   pageColor: '',             // '' = theme default
   fontFamily: 'battambang-roboto',
   fontSize: 16,              // Battambang is clearest at 16px or larger
@@ -45,6 +47,7 @@ function luminance(hex) {
 function applyPrefsToRoot(prefs) {
   const r = document.documentElement, f = FONTS[prefs.fontFamily] || FONTS['battambang-roboto'];
   r.dataset.theme = prefs.theme;
+  if (prefs.theme === 'anime') delete r.dataset.accent; else r.dataset.accent = ACCENTS.includes(prefs.accent) ? prefs.accent : 'terracotta';
   r.dataset.motion = prefs.motion || 'full';
   for (const k of ['text', 'bullet', 'check', 'quote', 'link', 'star', 'codeBg', 'codeInk', 'selection']) {
     const v = prefs.colors?.[k];

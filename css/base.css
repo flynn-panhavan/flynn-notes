@@ -1,32 +1,29 @@
 /* Flynn Notes – design tokens and components shared by the side panel and the settings page */
+/* Soft Glass bridge: theme.css (loaded first) owns every colour, shadow and radius.
+   Only app-specific aliases live here; each one points at a theme.css token. */
 :root {
-  --ui: "Roboto", "Battambang", system-ui, sans-serif;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ui: "Plus Jakarta Sans", "Battambang", var(--font);
   --f-family: "Roboto", "Battambang", system-ui, sans-serif;
   --f-size: 16px; --f-lh: 1.75; --f-style: normal; --f-weight: 400;
 
-  --bg: #ffffff; --surface: #f6f7fb; --surface-2: #eceef5; --ink: #161b2e; --muted: #667089; --line: #e5e8f0; --line-2: #d4d9e6;
-  --accent: #4c5cff; --accent-ink: #ffffff; --accent-soft: #eceeff; --accent-line: #c6ccff;
-  --danger: #d64545; --ok: #1f9d6b; --warn: #b9770e;
+  --ink: var(--text);
+  --line: var(--border);
+  --line-2: var(--border-strong);
+  --on-accent: light-dark(#ffffff, #ffffff);
+  --accent-ink: var(--on-accent);
+  --accent-line: rgba(var(--accent-rgb), .3);
 
-  --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
-  --shadow-sm: 0 1px 2px rgba(20, 28, 60, .06), 0 1px 1px rgba(20, 28, 60, .04);
-  --shadow: 0 14px 36px rgba(20, 28, 60, .16), 0 2px 8px rgba(20, 28, 60, .06);
-  --ring: 0 0 0 3px color-mix(in srgb, var(--accent) 26%, transparent);
+  --r-sm: var(--radius-sm); --r-md: var(--radius-btn); --r-lg: var(--radius);
+  --shadow: var(--shadow-lg);
   --bgimg: none;
-  --sel-bg: #b8d4ff; --sel-ink: #0f1b33;
+  --sel-bg: rgba(var(--accent-rgb), .22); --sel-ink: var(--text);
   --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238790a6' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  color-scheme: light;
 }
-[data-theme="dark"] {
-  --bg: #11131a; --surface: #171a23; --surface-2: #1f232e; --ink: #e8ebf3; --muted: #8e96ab; --line: #262b38; --line-2: #343a4a;
-  --accent: #8e9cff; --accent-ink: #0d1230; --accent-soft: #232a4f; --accent-line: #3a4380;
-  --danger: #ff7b7b; --ok: #4cc795; --warn: #f0b95a;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
-  --shadow: 0 14px 36px rgba(0, 0, 0, .55), 0 2px 8px rgba(0, 0, 0, .3);
-  color-scheme: dark;
-}
-[data-theme="anime"] {
+/* Anime Night keeps its own palette (a separate, always-dark theme; no accent presets). */
+:root[data-theme="anime"] {
+  --accent-rgb: 255, 143, 199; --text: #f0eaff; --text-2: #d6ccf5; --border-strong: #4d3d8f;
+  --ok-soft: rgba(111, 224, 176, .18); --warn-soft: rgba(240, 185, 90, .18); --danger-soft: rgba(255, 141, 141, .18);
+
   --bg: #151032; --surface: rgba(40, 28, 88, .62); --surface-2: rgba(70, 50, 140, .42); --ink: #f0eaff; --muted: #aa9fd6; --line: #3b2e72; --line-2: #4d3d8f;
   --accent: #ff8fc7; --accent-ink: #2a0f22; --accent-soft: rgba(255, 143, 199, .17); --accent-line: rgba(255, 143, 199, .45);
   --danger: #ff8d8d; --ok: #6fe0b0; --warn: #f0b95a;
@@ -64,28 +61,28 @@ input::selection, textarea::selection { background: var(--sel-bg); color: var(--
 
 /* Brand mark */
 .logo { width: 32px; height: 32px; flex: none; border-radius: 10px; display: grid; place-items: center; color: var(--accent-ink); font-size: 14px;
-  background: linear-gradient(140deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #b86bff)); box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 38%, transparent), inset 0 1px 0 rgba(255, 255, 255, .28); }
+  background: var(--logo-gradient); box-shadow: var(--btn-shadow), inset 0 1px 1px rgba(255, 255, 255, .25); }
 
 /* Buttons */
 .ib { position: relative; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--muted); flex: none; transition: background .14s, color .14s, transform .08s; }
 .ib:hover { background: var(--accent-soft); color: var(--ink); }
 .ib:active { transform: scale(.94); }
 .ib.on { color: var(--accent); }
-.primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 15px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; white-space: nowrap;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .22) inset, 0 3px 10px color-mix(in srgb, var(--accent) 34%, transparent); transition: filter .14s, transform .08s; }
-.primary:hover { filter: brightness(1.07); }
+.primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 15px; border-radius: var(--radius-btn); background: var(--accent-gradient); color: var(--accent-ink); font-weight: 600; white-space: nowrap;
+  box-shadow: var(--btn-shadow), inset 0 1px 1px rgba(255, 255, 255, .25); transition: filter .14s, transform .08s; }
+.primary:hover { background: var(--accent-gradient-hover); }
 .primary:active { transform: translateY(1px); }
 .ghost { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: 10px; color: var(--ink); font-weight: 500; white-space: nowrap; transition: background .14s; }
 .ghost:hover { background: var(--accent-soft); }
 .ghost.danger { color: var(--danger); }
 .ghost.danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
-.outline { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg); font-weight: 500; white-space: nowrap; box-shadow: var(--shadow-sm); transition: border-color .14s, background .14s; }
+.outline { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: var(--radius-btn); border: 1px solid var(--line-2); background: var(--surface); font-weight: 500; white-space: nowrap; box-shadow: var(--shadow-sm); transition: border-color .14s, background .14s; }
 .outline:hover { border-color: var(--accent-line); background: var(--accent-soft); }
 .outline.danger { color: var(--danger); }
 [data-theme="anime"] .outline { background: rgba(10, 6, 30, .35); }
 
 /* Popovers */
-.pop { position: absolute; z-index: 30; min-width: 220px; padding: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); animation: pop .12s ease-out; }
+.pop { position: absolute; z-index: 30; min-width: 220px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); animation: pop .12s ease-out; }
 [data-theme="anime"] .pop { background: #231a50; }
 @keyframes pop { from { opacity: 0; transform: translateY(-4px) scale(.98); } }
 

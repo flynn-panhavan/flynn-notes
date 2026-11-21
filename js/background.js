@@ -9,16 +9,25 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({ id: 'flynn-clip', title: 'Save selection to Flynn Notes', contexts: ['selection'] });
     chrome.contextMenus.create({ id: 'flynn-open', title: 'Open Flynn Notes', contexts: ['page', 'action'] });
+    chrome.contextMenus.create({ id: 'flynn-fullpage', title: 'Open Flynn Notes as full page', contexts: ['page', 'action'] });
   });
 });
 
+const openFullPage = async (windowId) => {
+  await chrome.tabs.create({ url: chrome.runtime.getURL('pages/sidepanel.html') });
+  // Hide the side panel so the same notes are not open twice
+  if (windowId != null && chrome.sidePanel.close) chrome.sidePanel.close({ windowId }).catch(() => {});
+};
+
 chrome.commands.onCommand.addListener((command, tab) => {
+  if (command === 'open-full-page') return openFullPage(tab && tab.windowId);
   if (!tab) return;
   chrome.sidePanel.open({ windowId: tab.windowId }); // first, while the shortcut still counts as a user gesture
   if (command === 'new-note') chrome.storage.local.set({ cmd: { type: 'new', t: Date.now() } });
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId === 'flynn-fullpage') return openFullPage(tab && tab.windowId);
   if (!tab) return;
   chrome.sidePanel.open({ windowId: tab.windowId });
   if (info.menuItemId !== 'flynn-clip' || !info.selectionText) return;

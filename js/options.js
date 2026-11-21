@@ -55,6 +55,12 @@ const THEMES = [
   ["dark", "Dark", "Easy on the eyes"],
   ["anime", "Anime Night", "Deep violet under the stars"],
 ];
+const ACCENT_LIST = [
+  ["terracotta", "Terracotta"],
+  ["blue", "Blue"],
+  ["lavender", "Lavender"],
+  ["teal", "Teal"],
+];
 const mock = (k) =>
   `<span class="mock ${k}"><span class="mk-s"><i></i><i></i><i></i><i></i></span><span class="mk-m"><b></b><i></i><i class="s"></i><i></i></span></span>`;
 
@@ -68,35 +74,37 @@ function renderAppearance() {
     <div class="cols"><div class="stack">
       <div class="card"><div class="card-h"><h3>Theme</h3></div>
         <div class="picks">${THEMES.map(([k, l, d]) => `<button class="pick ${prefs.theme === k ? "on" : ""}" data-theme-pick="${k}">${mock(k)}<b>${l}</b><small>${d}</small><span class="ck"><i class="fa-solid fa-check"></i></span></button>`).join("")}</div></div>
+      <div class="card"><div class="card-h"><h3>Accent</h3><span class="muted">${prefs.theme === "anime" ? "Anime Night has its own colors" : "Buttons, links, highlights"}</span></div>
+        <div class="colors" role="radiogroup" aria-label="Accent color">${ACCENT_LIST.map(([k, l]) => `<button class="accent-sw ${prefs.accent === k ? "on" : ""}" data-accent-preview="${k}" data-accent-pick="${k}" role="radio" aria-checked="${prefs.accent === k}" aria-label="${l}" title="${l}"><i class="fa-solid fa-check"></i></button>`).join("")}</div></div>
       <div class="card"><div class="card-h"><h3>Writing page color</h3></div>
         <div class="colors">${PAGE_COLORS.map(([c, l]) => `<button class="dotc ${prefs.pageColor === c ? "on" : ""}" data-page="${c}" title="${l}" style="${c ? "background:" + c : ""}">${c ? "" : '<i class="fa-solid fa-ban"></i>'}</button>`).join("")}
           <label class="row" style="gap:10px"><input type="color" id="pageCustom" value="${prefs.pageColor || "#ffffff"}" title="Custom color"><span class="muted">Custom</span></label></div>
-        <p class="muted" style="margin-top:16px">Changes the background behind your text. The default Light theme is pure white.</p></div>
+        <p class="muted" style="margin-top:16px">Changes the background behind your text. The default is the theme’s warm ivory.</p></div>
       <div class="card"><div class="card-h"><h3>Animation</h3><span class="muted">Panel and settings</span></div>
-        <div class="seg" id="motionSeg">${[
+        <div class="sg-glide" id="motionSeg">${[
           ["full", "Lively"],
           ["subtle", "Subtle"],
           ["off", "Off"],
         ]
           .map(
             ([k, l]) =>
-              `<button data-motion-pick="${k}" class="${prefs.motion === k ? "on" : ""}">${l}</button>`,
+              `<button data-motion-pick="${k}" class="${prefs.motion === k ? "active" : ""}">${l}</button>`,
           )
           .join("")}</div>
         <p class="muted" style="margin-top:14px"><b>Lively</b> adds cascading lists, bouncy stars and checkboxes, and a smooth toolbar. <b>Subtle</b> keeps only quick fades. <b>Off</b> turns every animation off. Your system’s “reduce motion” setting is always respected.</p></div>
     </div><div class="stack sticky">${livePreview()}</div></div>`;
   $("#appearance").onclick = (e) => {
     const t = e.target.closest("[data-theme-pick]"),
+      ac = e.target.closest("[data-accent-pick]"),
       p = e.target.closest("[data-page]"),
       mo = e.target.closest("[data-motion-pick]");
     if (mo)
-      update({ motion: mo.dataset.motionPick }).then(() => {
-        renderAppearance();
-        toast(`Animation: ${mo.textContent}`);
-      });
+      update({ motion: mo.dataset.motionPick }).then(() => toast(`Animation: ${mo.textContent}`));
+    if (ac) update({ accent: ac.dataset.accentPick }).then(renderAppearance);
     if (t) update({ theme: t.dataset.themePick }).then(renderAppearance);
     if (p) update({ pageColor: p.dataset.page }).then(renderAppearance);
   };
+  SGM.glide($("#motionSeg"));
   $("#pageCustom").oninput = (e) => update({ pageColor: e.target.value });
   $("#pageCustom").onchange = renderAppearance;
 }
@@ -122,14 +130,14 @@ function renderTypography() {
         <div class="slider"><span>Font size</span><input type="range" id="fs" min="12" max="32" step="1" value="${prefs.fontSize}"><output id="fsv">${prefs.fontSize}px</output></div>
         <div class="slider"><span>Line height</span><input type="range" id="lh" min="1.3" max="2.2" step="0.05" value="${prefs.lineHeight}"><output id="lhv">${(+prefs.lineHeight).toFixed(2)}</output></div>
         <div class="row" style="margin-top:18px"><span style="width:96px">Font style</span>
-          <div class="seg" id="styleSeg">${[
+          <div class="sg-glide" id="styleSeg">${[
             ["regular", "Regular"],
             ["italic", "Italic"],
             ["bold", "Bold"],
           ]
             .map(
               ([k, l]) =>
-                `<button data-style="${k}" class="${prefs.fontStyle === k ? "on" : ""}">${l}</button>`,
+                `<button data-style="${k}" class="${prefs.fontStyle === k ? "active" : ""}">${l}</button>`,
             )
             .join("")}</div></div>
         <p class="warn" id="fsWarn" ${prefs.fontSize < 16 && /battambang/.test(prefs.fontFamily) ? "" : "hidden"}><i class="fa-solid fa-triangle-exclamation"></i> Battambang loses clarity below 16px. Try 16px or larger.</p></div>
@@ -139,8 +147,9 @@ function renderTypography() {
     const f = e.target.closest("[data-font]"),
       s = e.target.closest("[data-style]");
     if (f) update({ fontFamily: f.dataset.font }).then(renderTypography);
-    if (s) update({ fontStyle: s.dataset.style }).then(renderTypography);
+    if (s) update({ fontStyle: s.dataset.style });
   };
+  SGM.glide($("#styleSeg"));
   const warn = () => {
     $("#fsWarn").hidden = !(
       prefs.fontSize < 16 && /battambang/.test(prefs.fontFamily)
@@ -370,9 +379,9 @@ function renderEditor() {
         <button class="outline" id="langs"><i class="fa-solid fa-arrow-up-right-from-square"></i>Chrome language settings</button></div>
     </div>
     <div class="card"><div class="card-h"><h3>Saving</h3><span class="muted">When changes are kept</span></div>
-      <div class="seg" id="asSeg">${AS_MODES.map(([k, l]) => `<button data-as="${k}" class="${mode === k ? "on" : ""}">${l}</button>`).join("")}</div>
-      <div class="sw-row" id="asMinRow" style="margin-top:14px" ${mode === "interval" ? "" : "hidden"}><span class="tx">Save after<small>Minutes of writing before a note is saved automatically.</small></span>
-        <select id="asMin" class="fld">${[1, 2, 3, 5, 10, 15, 30, 60].map((m) => `<option value="${m}" ${m === min ? "selected" : ""}>${m} ${m === 1 ? "minute" : "minutes"}</option>`).join("")}</select></div>
+      <div class="sg-glide" id="asSeg">${AS_MODES.map(([k, l]) => `<button data-as="${k}" class="${mode === k ? "active" : ""}">${l}</button>`).join("")}</div>
+      <div class="sg-collapse ${mode === "interval" ? "open settled" : ""}" id="asMinCol"><div class="sg-collapse-inner"><div class="sw-row" id="asMinRow" style="margin-top:14px"><span class="tx">Save after<small>Minutes of writing before a note is saved automatically.</small></span>
+        <select id="asMin" class="fld">${[1, 2, 3, 5, 10, 15, 30, 60].map((m) => `<option value="${m}" ${m === min ? "selected" : ""}>${m} ${m === 1 ? "minute" : "minutes"}</option>`).join("")}</select></div></div></div>
       <p class="muted" id="asHint" style="margin-top:14px">${asHint(mode, min)}</p></div>
     <div class="card"><div class="card-h"><h3>Auto-format cheat sheet</h3><span class="muted">Type, then press Space</span></div>
       <div class="cheat">
@@ -388,10 +397,12 @@ function renderEditor() {
     const b = e.target.closest("[data-as]");
     if (b)
       update({ autoSave: b.dataset.as }).then(() => {
-        renderEditor();
+        SGM.setOpen($("#asMinCol"), b.dataset.as === "interval");
+        $("#asHint").innerHTML = asHint(b.dataset.as, +prefs.autoSaveMin || 2);
         toast("Saving: " + b.textContent);
       });
   };
+  SGM.glide($("#asSeg"));
   $("#asMin").onchange = (e) =>
     update({ autoSaveMin: +e.target.value }).then(() => {
       $("#asHint").innerHTML = asHint("interval", +e.target.value);

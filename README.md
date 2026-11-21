@@ -2,13 +2,14 @@
 
 A browser-based notepad for Chrome that opens in the right-side panel. Flynn Notes is designed for quick writing, organizing notes, collecting useful web selections, and keeping your notes available while browsing.
 
-> **Current version:** 2.5.0  
+> **Current version:** 2.8.0  
 > **Platform:** Google Chrome (Manifest V3)
 
 ## Features
 
 - **Side-panel notes** — open Flynn Notes from the Chrome toolbar and write without leaving the current page.
-- **Quick access** — use keyboard shortcuts to open the panel or create a new note.
+- **Quick access** — use keyboard shortcuts to open the panel, open the full page, or create a new note.
+- **Open as full page** — expand Flynn Notes into a regular browser tab from the button in the Back / Next / Save bar, the notes drawer, the note menu, a shortcut, or the right-click menu. The side panel closes automatically so the same notes are not open twice.
 - **Rich-text editor** — format text with bold, italic, underline, strikethrough, headings, lists, checklists, quotes, links, code, highlights, and text colors.
 - **Note organization** — search note titles and content, and organize notes with notebooks, favorites, pinning, archive, and trash.
 - **Save, Back and Next buttons** — a bar above the editor always shows Back (undo), Next (redo) and Save, even when the formatting toolbar is hidden.
@@ -17,6 +18,7 @@ A browser-based notepad for Chrome that opens in the right-side panel. Flynn Not
 - **Web clipping** — select text on a webpage, right-click, and save the selection to Flynn Notes with its page link.
 - **Import and export** — import `.md` and `.txt` files, download individual notes as Markdown (the file is named exactly like the note), and use the storage settings to export or import a notes backup.
 - **Print and PDF** — print a note or save it as a PDF using the browser print dialog, with A4 formatting.
+- **Soft Glass theme** — warm ivory / charcoal surfaces, frosted-glass bars and menus, and four accent colors (terracotta, blue, lavender, teal) chosen in Settings → Appearance → Accent.
 - **Premium look** — gradient accents, frosted-glass panels, soft ambient light and spring animations in every theme. **Anime Night** adds falling sakura petals, a drifting aurora, glowing links and favorites, and an occasional shooting star.
 - **Personalization** — configure themes, fonts, font sizes, editor colors, and animation preferences.
 - **Toolbar controls** — hide or pin the formatting toolbar and customize supported editor shortcuts in Settings.
@@ -39,6 +41,7 @@ A browser-based notepad for Chrome that opens in the right-side panel. Flynn Not
 | Action | Default shortcut |
 | --- | --- |
 | Open Flynn Notes side panel | `Alt + Shift + S` |
+| Open Flynn Notes as a full page | `Alt + Shift + F` |
 | Open Flynn Notes and start a new note | `Alt + Shift + N` |
 | Increase editor font size | `Ctrl + Shift + .` |
 | Decrease editor font size | `Ctrl + Shift + ,` |
@@ -68,25 +71,32 @@ Your notes are stored in Chrome extension storage and should remain available wh
 
 ```text
 flynn-notes/
-├── manifest.json       # Chrome extension configuration
-├── background.js       # Service worker, commands, and context-menu actions
-├── sidepanel.html      # Main notes side-panel interface
-├── app.js              # Main editor and note interactions
-├── app.css             # Side-panel styling
-├── base.css            # Shared styles
-├── premium.css         # Premium visual layer: gradients, glass, anime effects, motion
-├── polish.css          # Final polish layer: flat toolbar, calm lists, focus and contrast
-├── shared.js           # Shared storage and utility functions
-├── options.html        # Settings page
-├── options.js          # Settings behavior
-├── options.css         # Settings styling
-├── print.html          # Print view
-├── print.js            # Print preparation
-├── print.css           # Print layout
-├── fonts.css           # Local font definitions
-├── fonts/              # Bundled font files
-├── icons/              # Extension icons
-└── vendor/             # Bundled third-party assets
+├── manifest.json            # Chrome extension configuration
+├── README.md
+├── pages/                   # HTML screens
+│   ├── sidepanel.html       # Main notes interface (side panel / full page)
+│   ├── options.html         # Settings page
+│   └── print.html           # Print view
+├── js/                      # Scripts
+│   ├── background.js        # Service worker, commands, context-menu actions
+│   ├── app.js               # Main editor and note interactions
+│   ├── shared.js            # Shared storage and utility functions
+│   ├── options.js           # Settings behavior
+│   ├── print.js             # Print preparation
+│   └── sg-motion.js         # Controller for the motion kit (window.SGM)
+├── css/                     # Styles
+│   ├── theme.css            # Soft Glass theme: tokens, accent presets (load first)
+│   ├── base.css             # Shared styles
+│   ├── app.css              # Main interface styling
+│   ├── options.css          # Settings styling
+│   ├── print.css            # Print layout
+│   ├── premium.css          # Premium visual layer
+│   ├── polish.css           # Final polish layer
+│   ├── sg-motion.css        # Motion kit animations
+│   └── fonts.css            # Local font definitions
+├── fonts/                   # Bundled font files
+├── icons/                   # Extension icons
+└── vendor/                  # Bundled third-party assets (Font Awesome)
 ```
 
 ## Data and permissions
@@ -97,7 +107,7 @@ The extension requests these Chrome permissions:
 
 - `storage` and `unlimitedStorage` — save notes and settings, with additional storage capacity for note content.
 - `sidePanel` — display the notepad in Chrome's side panel.
-- `contextMenus` — provide right-click actions for opening Flynn Notes and saving selected webpage text.
+- `contextMenus` — provide right-click actions for opening Flynn Notes (side panel or full page) and saving selected webpage text.
 - `activeTab` — support actions associated with the active browser tab.
 
 ## Built with
@@ -108,6 +118,27 @@ The extension requests these Chrome permissions:
 - Bundled local fonts and Font Awesome icons
 
 ## Version history
+
+### 2.8.0
+
+- Added **Open as full page**: a new button at the right end of the Back / Next / Save bar, plus the `Alt + Shift + F` shortcut and an "Open Flynn Notes as full page" right-click item (page and toolbar icon).
+- Opening the full page now saves the current note and closes the side panel (on Chrome versions that support closing it from the extension). Pressing the button inside the full page does not close it.
+- Reorganized the project into folders: `pages/` (HTML), `js/` (scripts) and `css/` (styles), with `manifest.json` and `README.md` at the root. All file paths were updated to match.
+
+### 2.7.0
+
+- Added the **Soft Glass Motion** kit (`sg-motion.css` / `sg-motion.js`).
+- Save button: a ring spinner while saving, then a ring pulse and a popping icon when the note is saved; the label slides in when it changes ("Save" ↔ "Saved"). The footer status text slides in too.
+- Import button shows a spinner while files are being imported.
+- Settings: Animation, Font style and Saving are now gliding segmented controls, and the "Save after N minutes" row opens and closes smoothly.
+- The Animation setting still rules everything: **Lively** plays all motion, **Subtle** keeps only quick fades and state changes, **Off** removes movement (loading spinners stay visible).
+
+### 2.6.0
+
+- New **Soft Glass** theme (`theme.css`): warm ivory in light mode, warm charcoal in dark mode, brown-tinted layered shadows, frosted-glass bars and menus, and Plus Jakarta Sans for the interface (bundled locally; Khmer still falls back to Battambang).
+- New **Accent** picker in Settings → Appearance: terracotta (default), blue, lavender or teal. Buttons, links, highlights, glows and the ambient light all follow the accent.
+- All colors in the app CSS now come from theme tokens, so light/dark and every accent stay consistent. Anime Night keeps its own palette.
+- The Light and Dark theme tiles in Settings now preview the real theme colors.
 
 ### 2.5.0
 
