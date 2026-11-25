@@ -7,7 +7,7 @@
 **A modern notepad that lives in Chrome's side panel, or opens as a full page.**
 Fast writing, notebooks, web clipping, and Markdown files saved to a folder you choose.
 
-![Version](https://img.shields.io/badge/version-2.8.0-C2603A)
+![Version](https://img.shields.io/badge/version-2.9.0-C2603A)
 ![Platform](https://img.shields.io/badge/platform-Chrome-4285F4?logo=googlechrome&logoColor=white)
 ![Manifest](https://img.shields.io/badge/Manifest-V3-34A853)
 ![Dependencies](https://img.shields.io/badge/runtime%20dependencies-0-success)
@@ -47,7 +47,7 @@ Flynn Notes is a Manifest V3 Chrome extension for quick, distraction-free note t
 
 | | |
 | --- | --- |
-| **Current version** | 2.8.0 |
+| **Current version** | 2.9.0 |
 | **Platform** | Google Chrome (Manifest V3) |
 | **Language** | Vanilla JavaScript, HTML, CSS |
 | **Build tooling** | None. The folder loads directly into Chrome. |
@@ -57,7 +57,8 @@ Flynn Notes is a Manifest V3 Chrome extension for quick, distraction-free note t
 ## Features
 
 ### Writing
-- **Rich-text editor**: bold, italic, underline, strikethrough, headings, bullet / numbered / check lists, quotes, links, inline code, highlights and text colors.
+- **Rich-text editor**: bold, italic, underline, strikethrough, headings, bullet / numbered / check lists, quotes, links, inline code, code blocks with a language, highlights and text colors.
+- **Code blocks with a header**: each block shows its language (click to change it) with **Copy** and **Download** buttons. Type ```` ```js ```` + Space to start one.
 - **Back, Next and Save bar**: always visible above the editor, even when the formatting toolbar is hidden.
 - **Flexible saving**: save instantly, N minutes after you start writing, or only when you press Save. Unsaved text is kept as a draft and restored if the panel closes.
 - **Writing statistics**: word count, character count and estimated reading time.
@@ -112,6 +113,8 @@ Notes live in Chrome extension storage and survive updates. Export a backup befo
 | I want to… | Do this |
 | --- | --- |
 | Open the notes | Click the toolbar icon, or press `Alt + Shift + S` |
+| Add a code block | Click the `</>` button, press `Ctrl + Alt + C`, or type ```` ```js ```` and Space |
+| Copy or download a code block | Use **Copy** / **Download** in the block's header |
 | Start a new note | Press `Alt + Shift + N`, or use **New note** in the drawer |
 | Open as a full page | Click the expand-arrows button next to Save, or press `Alt + Shift + F` |
 | Clip text from a page | Select text, right-click, **Save selection to Flynn Notes** |
@@ -129,6 +132,7 @@ Notes live in Chrome extension storage and survive updates. Export a backup befo
 | Save now | `Ctrl + S` |
 | Increase editor font size | `Ctrl + Shift + .` |
 | Decrease editor font size | `Ctrl + Shift + ,` |
+| Code block | `Ctrl + Alt + C` |
 | Hide or show the toolbar | `Alt + T` |
 | Pin or unpin the toolbar | `Alt + P` |
 
@@ -227,7 +231,7 @@ flynn-notes/
 └── vendor/                  # Bundled third-party assets (Font Awesome)
 ```
 
-**Size at a glance:** about 5,800 lines across 6 scripts, 9 stylesheets and 3 pages. The largest file is `js/app.js` (about 1,900 lines).
+**Size at a glance:** about 5,900 lines across 6 scripts, 9 stylesheets and 3 pages. The largest file is `js/app.js` (about 2,000 lines).
 
 ## Data and storage
 
@@ -235,14 +239,14 @@ All data stays in your browser. There is no account, server or cloud sync.
 
 | Key | Contents |
 | --- | --- |
-| `note:<id>` | One entry per note: `id`, `title`, `html`, `created`, `modified`, plus flags `pinned`, `favorite`, `archived`, `trashed` and `clips` |
+| `note:<id>` | One entry per note: `id`, `title`, `html`, `created`, `modified`, plus flags `pinned`, `favorite`, `archived`, `trashed` and `clips`. Code blocks are `<pre data-lang="js">`; the language header is drawn by the editor and is not stored |
 | `prefs` | Appearance, typography, editor and shortcut preferences |
 | `activeSide` | The note currently open |
 | `cmd` | A one-off command from the service worker to the page |
 
 Storage area: `chrome.storage.local` with `unlimitedStorage`.
 
-**Optional save folder.** When you connect a folder through the File System Access API, each note is also written as a Markdown file, and each notebook becomes a subfolder. Files are named exactly like the note (`Shopping list.md`); duplicate titles become `Title (2).md`.
+**Optional save folder.** When you connect a folder through the File System Access API, each note is also written as a Markdown file, and each notebook becomes a subfolder. Files are named exactly like the note (`Shopping list.md`); duplicate titles become `Title (2).md`. Code blocks are written as fenced blocks with their language (```` ```js ````) and read back the same way on import.
 
 ## Permissions and privacy
 
@@ -356,6 +360,13 @@ Commit messages use a short imperative summary, for example `Add full-page butto
 No license file is currently included. Unless a license is added to this repository, all rights remain with the copyright holder. Add a `LICENSE` file before sharing or publishing the project, and update this section to match.
 
 ## Changelog
+
+### 2.9.0
+
+- **Code blocks now have a header.** Every code block shows a bar at the top: the language on the left (click it to change it: text, md, js, ts, py, c, cpp, cs, java, go, rs, php, sql, json, yaml, html, css, bash) and **Copy** and **Download** on the right. Download saves the block as `code.<ext>` (for example `code.py`). The header is drawn above the editor, so it is never saved into the note. The header uses a thin `</>` icon and follows the light, dark and Anime Night themes. The language also shows as a small label in the print view.
+- Type ```` ```js ```` and press Space to start a code block in that language (a bare ```` ``` ```` + Space gives a plain code block).
+- Markdown export writes the language on the fence (```` ```js ````) and import reads it back, so languages survive a round trip.
+- **Tab** inside a code block inserts two spaces instead of moving focus.
 
 ### 2.8.0
 

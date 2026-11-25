@@ -26,6 +26,9 @@ html, body { height: auto; background: #e9ebf2; color: #1c2233; }
 #doc pre { background: var(--c-code-bg, #f6f7fb); color: var(--c-code-ink, inherit); border: 1px solid #e5e8f0; border-radius: 10px; padding: 10px 12px; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; margin: .7em 0; }
 #doc code { background: var(--c-code-bg, #eceef5); color: var(--c-code-ink, inherit); padding: .1em .4em; border-radius: 5px; font: .9em var(--mono); }
 #doc pre code { background: none; padding: 0; }
+#doc pre { position: relative; break-inside: avoid; }
+#doc pre[data-lang] { padding-top: 24px; }
+#doc pre[data-lang]::before { content: attr(data-lang); position: absolute; top: 6px; right: 10px; font: 600 9.5px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: #667089; }
 #doc ul.check { list-style: none; padding-left: 2px; }
 #doc ul.check li { position: relative; padding-left: 29px; }
 #doc ul.check li::before { content: ""; position: absolute; left: 3px; top: calc(.5em * var(--f-lh) - 8px + .1em); width: 16px; height: 16px; border: 1.8px solid #667089; border-radius: 5px; }

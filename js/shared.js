@@ -123,6 +123,8 @@ function comboFromEvent(e) {
 const plain = html => (html || '').replace(/<(br|\/p|\/div|\/li|\/h\d|\/blockquote)[^>]*>/gi, ' ').replace(/<[^>]+>/g, '')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/\s+/g, ' ').trim();
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+// code block language tag: letters, digits and + # - . only, e.g. js, py, cpp, c++, c#
+const cleanLang = s => String(s ?? '').toLowerCase().replace(/[^a-z0-9+#.-]/g, '').slice(0, 20);
 const mdEsc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /* ---------- notebooks ---------- */
@@ -162,9 +164,9 @@ function mdToHtml(src) {
     const l = lines[i]; let m;
     if (!l.trim()) { i++; continue; }
     if (/^```/.test(l)) {
-      const buf = []; i++;
+      const lang = cleanLang(l.slice(3).trim().split(/\s+/)[0]), buf = []; i++;
       while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
-      i++; out.push(`<pre>${mdEsc(buf.join('\n'))}</pre>`); continue;
+      i++; out.push(`<pre${lang ? ` data-lang="${lang}"` : ''}>${mdEsc(buf.join('\n'))}</pre>`); continue;
     }
     if ((m = /^(#{1,6})\s+(.*)$/.exec(l))) { const h = m[1].length === 1 ? 1 : 2; out.push(`<h${h}>${mdInline(m[2])}</h${h}>`); i++; continue; }
     if (HR.test(l)) { out.push('<hr>'); i++; continue; }
@@ -350,7 +352,7 @@ function md(node) {
       case 'H2': out += `\n\n## ${inner()}\n\n`; break;
       case 'HR': out += '\n\n---\n\n'; break;
       case 'BR': out += '\n'; break;
-      case 'PRE': out += '\n\n```\n' + c.textContent + '\n```\n\n'; break;
+      case 'PRE': out += '\n\n```' + cleanLang(c.dataset.lang) + '\n' + c.textContent.replace(/\n$/, '') + '\n```\n\n'; break;
       case 'BLOCKQUOTE': out += '\n\n' + inner().trim().split('\n').map(l => '> ' + l).join('\n') + '\n\n'; break;
       case 'UL': case 'OL': {
         let i = 0; out += '\n';

@@ -1531,6 +1531,7 @@ function refreshTools() {
   captureRange();
   if (document.activeElement !== editor) return;
   updateListbar();
+  layoutHeads();
   const on = (cmd, v) => $(`[data-cmd="${cmd}"]`)?.classList.toggle("on", !!v);
   try {
     on("bold", document.queryCommandState("bold"));
@@ -1686,6 +1687,102 @@ $("#lbCont").onclick = () => {
   setStart((p.start || 1) + p.querySelectorAll(":scope > li").length);
 };
 
+/* ---------- code block header: language, Copy, Download ----------
+   Each <pre> gets a header drawn in a layer above the editor (outside it, so it is never saved
+   into the note). The layer follows the blocks as the text scrolls, wraps or changes. */
+const heads = $("#codeHeads");
+const CODE_LANGS = [
+  ["", "text"], ["md", "md"], ["js", "js"], ["ts", "ts"], ["py", "py"],
+  ["c", "c"], ["cpp", "cpp"], ["cs", "cs"], ["java", "java"], ["go", "go"],
+  ["rs", "rs"], ["php", "php"], ["sql", "sql"], ["json", "json"],
+  ["yaml", "yaml"], ["html", "html"], ["css", "css"], ["bash", "bash"],
+];
+const LANG_EXT = { "": "txt", bash: "sh", python: "py", javascript: "js", typescript: "ts", "c++": "cpp", "c#": "cs", rust: "rs", markdown: "md", text: "txt" };
+const headOf = new Map(); // pre -> header element
+const codeText = (pre) => pre.textContent.replace(/\n$/, "");
+function langOptions(sel, lang) {
+  sel.innerHTML = "";
+  for (const [v, l] of CODE_LANGS) sel.add(new Option(l, v));
+  // a language that is not in the list (for example "rb" from an import) is added so it is not lost
+  if (lang && !CODE_LANGS.some(([v]) => v === lang)) sel.add(new Option(lang, lang));
+  sel.value = lang;
+}
+function makeHead(pre) {
+  const h = document.createElement("div");
+  h.className = "ch";
+  h.innerHTML =
+    '<svg class="ch-ico" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M5 4.5 1.5 8 5 11.5M11 4.5 14.5 8 11 11.5M9.2 3 6.8 13" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+    '<select class="ch-lang" aria-label="Code language"></select>' +
+    '<button type="button" class="ch-btn ch-copy"><i class="fa-regular fa-copy"></i><span>Copy</span></button>' +
+    '<button type="button" class="ch-btn ch-dl"><i class="fa-solid fa-download"></i><span>Download</span></button>';
+  const sel = h.querySelector("select");
+  sel.onchange = () => {
+    const lang = cleanLang(sel.value);
+    if (lang) pre.dataset.lang = lang;
+    else pre.removeAttribute("data-lang");
+    touch();
+  };
+  h.addEventListener("mousedown", (e) => {
+    if (!e.target.closest("select")) e.preventDefault(); // keep the caret in the note
+  });
+  h.querySelector(".ch-copy").onclick = async (e) => {
+    const b = e.currentTarget, label = b.querySelector("span");
+    try {
+      await navigator.clipboard.writeText(codeText(pre));
+      label.textContent = "Copied";
+      b.classList.add("ok");
+      setTimeout(() => { label.textContent = "Copy"; b.classList.remove("ok"); }, 1600);
+    } catch {
+      toast("Could not copy");
+    }
+  };
+  h.querySelector(".ch-dl").onclick = () => {
+    const lang = cleanLang(pre.dataset.lang);
+    let ext = LANG_EXT[lang] ?? lang;
+    if (!/^[a-z0-9]{1,6}$/.test(ext)) ext = "txt";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([codeText(pre) + "\n"], { type: "text/plain" }));
+    a.download = "code." + ext;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  };
+  return h;
+}
+let headRaf = 0;
+function layoutHeads() {
+  cancelAnimationFrame(headRaf);
+  headRaf = requestAnimationFrame(() => {
+    const pres = [...editor.querySelectorAll("pre")];
+    for (const [pre, h] of headOf)
+      if (!pres.includes(pre)) { h.remove(); headOf.delete(pre); }
+    // the layer covers exactly the editor box and clips headers that scroll out of it
+    Object.assign(heads.style, {
+      top: editor.offsetTop + "px", left: editor.offsetLeft + "px",
+      width: editor.clientWidth + "px", height: editor.clientHeight + "px",
+    });
+    const lr = heads.getBoundingClientRect();
+    const locked = !editor.isContentEditable;
+    for (const pre of pres) {
+      let h = headOf.get(pre);
+      if (!h) { h = makeHead(pre); headOf.set(pre, h); heads.append(h); }
+      const lang = cleanLang(pre.dataset.lang), sel = h.querySelector("select");
+      if (sel.dataset.lang !== lang || sel.options.length === 0) {
+        langOptions(sel, lang);
+        sel.dataset.lang = lang;
+      }
+      sel.disabled = locked;
+      const r = pre.getBoundingClientRect();
+      h.style.top = r.top - lr.top + "px";
+      h.style.left = r.left - lr.left + "px";
+      h.style.width = r.width + "px";
+    }
+  });
+}
+new MutationObserver(layoutHeads).observe(editor, { childList: true, subtree: true, characterData: true, attributes: true });
+new ResizeObserver(layoutHeads).observe(editor);
+editor.addEventListener("scroll", layoutHeads, { passive: true });
+window.addEventListener("resize", layoutHeads);
+
 function tryAutoFormat(e) {
   const sel = getSelection();
   if (!sel.rangeCount || !sel.isCollapsed || !inEditor(sel.anchorNode)) return;
@@ -1701,7 +1798,10 @@ function tryAutoFormat(e) {
   r.setEnd(sel.anchorNode, sel.anchorOffset);
   const before = r.toString();
   const num = /^\d{1,4}[.)]$/.test(before) ? parseInt(before) : 0;
-  const cmd = /^[-*•]$/.test(before)
+  const fence = /^```([a-z0-9+#.-]{0,20})$/i.exec(before);
+  const cmd = fence
+    ? "code"
+    : /^[-*•]$/.test(before)
     ? "ul"
     : num
       ? "ol"
@@ -1723,6 +1823,12 @@ function tryAutoFormat(e) {
   sel.removeAllRanges();
   sel.addRange(r);
   ACT[cmd]();
+  if (fence) {
+    const pre = closest("pre");
+    if (pre && fence[1]) pre.dataset.lang = cleanLang(fence[1]);
+    touch();
+    refreshTools();
+  }
   if (cmd === "ol") {
     const ol = closest("ol");
     if (ol && ol.children.length === 1) {
@@ -1780,6 +1886,11 @@ editor.addEventListener("keydown", (e) => {
       const li = closest("li");
       if (li && li !== prev) li.classList.remove("done");
     }, 0);
+  }
+  if (e.key === "Tab" && closest("pre")) {
+    e.preventDefault();
+    document.execCommand("insertText", false, "  ");
+    return;
   }
   if (e.key === "Tab" && closest("li")) {
     e.preventDefault();
