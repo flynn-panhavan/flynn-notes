@@ -1699,7 +1699,7 @@ const CODE_LANGS = [
 ];
 const LANG_EXT = { "": "txt", bash: "sh", python: "py", javascript: "js", typescript: "ts", "c++": "cpp", "c#": "cs", rust: "rs", markdown: "md", text: "txt" };
 const headOf = new Map(); // pre -> header element
-const codeText = (pre) => pre.textContent.replace(/\n$/, "");
+const codeText = (pre) => preText(pre);
 function langOptions(sel, lang) {
   sel.innerHTML = "";
   for (const [v, l] of CODE_LANGS) sel.add(new Option(l, v));
@@ -1728,7 +1728,19 @@ function makeHead(pre) {
   h.querySelector(".ch-copy").onclick = async (e) => {
     const b = e.currentTarget, label = b.querySelector("span");
     try {
-      await navigator.clipboard.writeText(codeText(pre));
+      const text = codeText(pre), lang = cleanLang(pre.dataset.lang);
+      // plain text for simple fields, plus a <pre><code> version so rich inputs (like a chat box) paste it as code
+      const html = `<pre><code${lang ? ` class="language-${lang}"` : ""}>${mdEsc(text)}</code></pre>`;
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/plain": new Blob([text], { type: "text/plain" }),
+            "text/html": new Blob([html], { type: "text/html" }),
+          }),
+        ]);
+      } catch {
+        await navigator.clipboard.writeText(text);
+      }
       label.textContent = "Copied";
       b.classList.add("ok");
       setTimeout(() => { label.textContent = "Copy"; b.classList.remove("ok"); }, 1600);

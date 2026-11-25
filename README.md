@@ -367,6 +367,8 @@ No license file is currently included. Unless a license is added to this reposit
 - Type ```` ```js ```` and press Space to start a code block in that language (a bare ```` ``` ```` + Space gives a plain code block).
 - Markdown export writes the language on the fence (```` ```js ````) and import reads it back, so languages survive a round trip.
 - **Tab** inside a code block inserts two spaces instead of moving focus.
+- **Copy** puts both plain text and a `<pre><code>` version on the clipboard, so rich inputs (such as a chat box) paste it as a code block and plain fields get clean text.
+- Copy, Download and Markdown export keep every line break of a code block, the same as selecting and copying by hand.
 
 ### 2.8.0
 

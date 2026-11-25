@@ -125,6 +125,22 @@ const plain = html => (html || '').replace(/<(br|\/p|\/div|\/li|\/h\d|\/blockquo
 const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 // code block language tag: letters, digits and + # - . only, e.g. js, py, cpp, c++, c#
 const cleanLang = s => String(s ?? '').toLowerCase().replace(/[^a-z0-9+#.-]/g, '').slice(0, 20);
+// plain text of a code block with its line breaks kept: <br> and block children (div / p) become \n,
+// which textContent would drop (everything would join into one line)
+function preText(pre) {
+  let out = '';
+  const walk = n => n.childNodes.forEach(c => {
+    if (c.nodeType === 3) { out += c.data; return; }
+    if (c.nodeType !== 1) return;
+    if (c.tagName === 'BR') { out += '\n'; return; }
+    const blk = /^(DIV|P|LI)$/.test(c.tagName);
+    if (blk && out && !out.endsWith('\n')) out += '\n';
+    walk(c);
+    if (blk && !out.endsWith('\n')) out += '\n';
+  });
+  walk(pre);
+  return out.replace(/[\u00a0]/g, ' ').replace(/[\u200b\ufeff]/g, '').replace(/\n$/, '');
+}
 const mdEsc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /* ---------- notebooks ---------- */
@@ -352,7 +368,7 @@ function md(node) {
       case 'H2': out += `\n\n## ${inner()}\n\n`; break;
       case 'HR': out += '\n\n---\n\n'; break;
       case 'BR': out += '\n'; break;
-      case 'PRE': out += '\n\n```' + cleanLang(c.dataset.lang) + '\n' + c.textContent.replace(/\n$/, '') + '\n```\n\n'; break;
+      case 'PRE': out += '\n\n```' + cleanLang(c.dataset.lang) + '\n' + preText(c) + '\n```\n\n'; break;
       case 'BLOCKQUOTE': out += '\n\n' + inner().trim().split('\n').map(l => '> ' + l).join('\n') + '\n\n'; break;
       case 'UL': case 'OL': {
         let i = 0; out += '\n';
